@@ -90,6 +90,7 @@ CHOICES = {
                                                            {lbl="NES", exec="../nes/xnes ../nes/roms/Dr.\\ Mario\\ \\(E\\)\\ \\[\\!\\].nes"} } },
                                 { lbl="Script >",  items={ {lbl="Demo",    script="test.lua"}, 
                                                            {lbl="Raycast", script="rcmoa.lua"}, 
+                                                           {lbl="Tetris",   script="tetris.lua"}, 
                                                            {lbl="Sound",   script="sound.lua"} } },
                                 { lbl="Native >",  items={} },
                                 { lbl="Bash",      exec="/bin/bash" } } },

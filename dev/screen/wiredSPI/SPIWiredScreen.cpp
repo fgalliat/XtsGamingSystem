@@ -519,7 +519,7 @@
 
 
             // since 18/09/2018
-            if ( color > 0 && color < 10 ) {
+            if ( color > 0 && color < 16 ) {
                      if ( color == 0 ) { color = CLR_BLACK; }
                 else if ( color == 1 ) { color = CLR_WHITE; }
                 else if ( color == 2 ) { color = CLR_LIGHTGRAY; }
@@ -530,7 +530,12 @@
                 else if ( color == 6 ) { color = CLR_GREEN; }
                 else if ( color == 7 ) { color = CLR_DARKGREEN; }
 
-                else if ( color == 8 ) { color = CLR_PINK; }
+                else if ( color ==  8 ) { color = CLR_PINK; }
+                else if ( color ==  9 ) { color = CLR_CYAN; }
+                else if ( color == 10 ) { color = CLR_RED; }
+                else if ( color == 11 ) { color = CLR_GREEN; }
+                else if ( color == 12 ) { color = CLR_BLUE; }
+                
             }
 
             unsigned short int t = color;

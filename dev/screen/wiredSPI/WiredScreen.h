@@ -5,6 +5,8 @@
 
 #define rgb16(r,g,b) { (uint16_t)( (( r *31/255 )<<11) | (( g *63/255 )<<5) | ( b *31/255 ) ) }
 
+#define CLR_CYAN  rgb16(0,255,255)
+
 #define CLR_PINK  rgb16(255,0,150)
 #define CLR_RED   rgb16(255,0,0)
 #define CLR_GREEN rgb16(0,255,0)

@@ -5,8 +5,8 @@ MODE="DESKTOP"
 
 # Oui pour emulation de la console !!!
 MODE="XTSCONSOLE"
-. ../desktop.arch
-#. ../arietta.arch
+#. ../desktop.arch
+. ../arietta.arch
 
 DEPS="$CPPs"
 

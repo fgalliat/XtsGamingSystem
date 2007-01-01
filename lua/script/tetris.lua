@@ -30,15 +30,9 @@ KEY = { PRESSED = 0, RELEASED = 3,
 
 -- ////////////////////////////////////////
 
---Ext_Scheduler = luajava.newInstance( "com.xtase.lua.hardware.object.Ext_LuaScheduler" )
---schedule = Ext_Scheduler.new()
---schedule:setHook("OnTimeout()")
 
 SYSTEM_SLEEP = 500
 function CTBL_StartTimer(waitDelay)
-  -- in reallity => not wait -> Thread.runSchedule
-  --schedule:start( waitDelay )
-  
   if ( _GLOBAL_isPC ) then
     --waitDelay = waitDelay * 0.8
     waitDelay = waitDelay * 0.2
@@ -46,33 +40,32 @@ function CTBL_StartTimer(waitDelay)
   
   
   SYSTEM_SLEEP = waitDelay
-  --SYSTEM_SLEEP = 0
 end
 
 -- ////////////////////////////////////////
 
 function CTBL_Invalidate()
-  --screen:flip()
-  
   OnPaint(ScreenWidth,ScreenHeight)
-  --local _status, _err = pcall(function ()  OnPaint(ScreenWidth,ScreenHeight)  ; end)
-  
-  if ( not _GLOBAL_isPC ) then
-    --screen:waitVblankStart()
-  end
 end
 
---[[
---gColors = { 0xFFFFFF, 0xFF0000, 0x00FF00, 0x0000FF, 0xFF00FF, 0x00FFFF, 0xFFFF00 }
-gColors = { Color.new( 0xFF, 0xFF, 0xFF ), -- 1 white
-            Color.new( 0xFF, 0x00, 0x00 ), -- 2 red
-            Color.new( 0x00, 0xFF, 0x00 ), -- 3 green
-            Color.new( 0x00, 0x00, 0xFF ), -- 4 blue
-            Color.new( 0xFF, 0x00, 0xFF ), -- 5 pink
-            Color.new( 0x00, 0xFF, 0xFF ), -- 6 cyan
-            Color.new( 0xFF, 0xFF, 0x00 )  -- 7 yellow
+gColors = { 1, -- 1 white
+            10, -- 2 red
+            11, -- 3 green
+            
+            --12, -- 4 blue
+            31, -- 4 blue -- forced 565 value of blue
+            
+            8, -- 5 pink
+            9, -- 6 cyan
+            5, -- 7 yellow (lightgreen)
+            12,10,8,8,10,11,12
              }
-]]--
+_RED = 2
+_WHITE = 1
+_BLACK = 0
+_CYAN = 6
+BorderColor = _CYAN -- light blue
+
 
 --[[
 imgPath = "./imgs/"
@@ -93,54 +86,16 @@ bulletYellowImg = Image.load( imgPath.."bulett_yellow.png" )
 ]]
 
 function CTBL_DrawRectDispText(x,y,w,h,color)
-  --[[ if ( color == _WHITE ) then
-    --screen:blit( x,y, bulletTextImg, 0, 0, BlockSize, BlockSize, false )
-    screen:blit( x,y, bulletTextImg, 0, 0, w, h, false )
-  else
-    screen:fillRect(x, y, w, h, color)
-  end
-  ]]--
-  
+  if (color > 0) then color = gColors[color]; end -- 'cause arrays begins @1
   lcd.rect(x, y, w, h, 1, color)
 end
 
 function CTBL_DrawRect(x,y,w,h,color)
---[[
-  if ( color == BorderColor ) then
-    --screen:blit( x,y, borderImg, 0, 0, BlockSize, BlockSize, false )
-    screen:blit( x,y, borderImg, 0, 0, w, h, false )
-  elseif ( color == gColors[1] and bulletWhiteImg ~= nil ) then
-    screen:blit( x,y, bulletWhiteImg, 0, 0, w, h, false )
-  elseif ( color == gColors[2] and bulletRedImg ~= nil ) then
-    screen:blit( x,y, bulletRedImg, 0, 0, w, h, false )
-  elseif ( color == gColors[3] and bulletGreenImg ~= nil ) then
-    screen:blit( x,y, bulletGreenImg, 0, 0, w, h, false )
-  elseif ( color == gColors[4] and bulletBlueImg ~= nil ) then
-    screen:blit( x,y, bulletBlueImg, 0, 0, w, h, false )
-  elseif ( color == gColors[5] and bulletPinkImg ~= nil ) then
-    screen:blit( x,y, bulletPinkImg, 0, 0, w, h, false )
-  elseif ( color == gColors[6] and bulletCyanImg ~= nil ) then
-    screen:blit( x,y, bulletCyanImg, 0, 0, w, h, false )
-  elseif ( color == gColors[7] and bulletYellowImg ~= nil ) then
-    screen:blit( x,y, bulletYellowImg, 0, 0, w, h, false )
-  else
-    screen:fillRect(x, y, w, h, color)
-  end
-
-  --screen:fillRect(x, y, w, h, color)
-  ]]--
-  
+  if (color > 0) then color = gColors[color]; end -- 'cause arrays begins @1
   lcd.rect(x, y, w, h, 1, color)
 end
 
---[[
-_RED = Color.new(255, 0, 0)
-_WHITE = Color.new(255, 255, 255)
-_BLACK = Color.new(0, 0, 0)
-]]--
-_RED = 8
-_WHITE = 1
-_BLACK = 0
+
 
 -- ////////////////////////////////////////
 -- ////////////////////////////////////////
@@ -196,13 +151,6 @@ gAllPieces = {
 
 
 -- Colors
--- in RGB format each component over 8 bits
---BorderColor = 0x0077A0
---BorderColor = Color.new( 0x00, 0x77, 0xA0 )
-BorderColor = 9 -- light blue
-
-
-
 
 -- Font
 -- gFontSize is in unit, each character is a set of rect x,y,w,h
@@ -245,19 +193,12 @@ function dispText(x,y,str,s)
     local ch = string.sub(str,i,i)
     local letter = gFont[ ch ]
     
-    --local tmp = i
-    --print( 10, 10+tmp, i.." - "..ch, _WHITE )
-    
     if letter ~= nil then
-      --print( 17, 10+tmp, "OK "..#letter, _WHITE )
-    
       for j=1,#letter do
         xd = (letter[j][1] + (i-1)*6) * s + x
         yd = letter[j][2] * s + y
         w = letter[j][3] * s
         h = letter[j][4] * s
-        --CTBL:DrawRect(xd, yd, w, h, 0xFFFFFF)
-        --CTBL_DrawRect(xd, yd, w, h, _WHITE)
         CTBL_DrawRectDispText(xd, yd, w, h, _WHITE)
       end
     end
@@ -326,6 +267,9 @@ end
 function newCPiece()
   local v = { x = 6, y = 1, rot = 1 }
   v.ptype = math.random(#gAllPieces) -- piece type from 1 to number of pieces (7)
+  
+  print( "New piece #".. v.ptype )
+  
   setmetatable(v, CPiece_mt)
   return v
 end
@@ -345,7 +289,9 @@ CBoard_mt.__index = CBoard_mt
 function CBoard_mt.disp(self, x, y)
   local i,j
 
-  --CTBL:DrawRect(x, y, BlockSize, (self.h+2)*BlockSize, BorderColor) -- Left
+--erase
+CTBL_DrawRect(x, y, self.w*BlockSize,self.h* BlockSize, 0)
+
   CTBL_DrawRect(x, y, BlockSize, (self.h+2)*BlockSize, BorderColor) -- Left
   CTBL_DrawRect(x+(self.w+1)*BlockSize, y, BlockSize, (self.h+2)*BlockSize, BorderColor) -- Right
   CTBL_DrawRect(x+BlockSize, y, self.w*BlockSize, BlockSize, BorderColor) -- Top
@@ -589,8 +535,7 @@ function CGame_mt.down(self)
     return
   end
   self.timerDT = 50
-  --CTBL:StartTimer(self.timerDT)
-  CTBL_StartTimer(self.timerDT)
+  --CTBL_StartTimer(self.timerDT)
   
 --  while not self.newpiece do
 --    self:step()
@@ -643,7 +588,7 @@ end
 ]]--
 
 --CTBL_DrawRect(0, 0, ScreenWidth, ScreenHeight, _BLACK) -- Background is black
-lcd.cls()
+-- lcd.cls()
 -- .............
   
   gGame.board:disp(CenterX+4*BlockSize, CenterY)
@@ -712,8 +657,8 @@ function OnKeyInput(action, logicalkey)
     else
       if gGame.title then
         gGame.title = false
-        --CTBL:StartTimer(gGame.timerDT)
-        CTBL_StartTimer(gGame.timerDT)
+        -- CTBL_StartTimer(gGame.timerDT)
+        lcd.cls()
       end
     end
     
@@ -739,6 +684,7 @@ end
 -- OnTimeout is called when timer expires
 --
 function OnTimeout()
+--print("timeout")
 
 ----if ( _async_in_paint or _async_in_step ) then
 --if ( _async_in_paint ) then
@@ -786,14 +732,6 @@ end
 
 -- ////////////////////////////////////////
 
-function infiniteLoop(str)
-while true do
- --screen:clear()
- print( 1, 1, "".."INFINITE LOOP : "..str, _RED )
- CTBL_Invalidate()
-end
-end
-
 __i=3
 function __print(str) 
   print( 10, __i, ""..str, _WHITE )
@@ -801,45 +739,6 @@ function __print(str)
 end
 
 
---[[
-
-
-package com.xtase.lua.hardware.object;
-
-public class LuaTimer {
-    long start = 0L;
-    static long consoleStartTime = -1L;
-
-    static {
-        consoleStartTime = now();
-    }
-
-    public LuaTimer() {
-    }
-
-    public void reset() {
-        consoleStartTime = now();
-    }
-
-    public void reset(int ignored) {
-        consoleStartTime = now();
-    }
-
-    public void start() {
-        this.start = now();
-    }
-
-    public long time() {
-        return now() - consoleStartTime;
-    }
-
-    static long now() {
-        return System.currentTimeMillis();
-    }
-}
-
-
-]]--
 
 Timer = {
 
@@ -879,62 +778,10 @@ end
 
 
 
-_Controller = {
-  cross = function()
-    return false
-  end,
-  triangle = function()
-    return false
-  end,
-  square = function()
-    return false
-  end,
-  circle = function()
-    return false
-  end,
-  up = function()
-    return false
-  end,
-  down = function()
-    return false
-  end,
-  left = function()
-    return false
-  end,
-  right = function()
-    return false
-  end
-}
-
-
-Controls = {
-  read = function()
-    return _Controller
-  end
-}
-
 -- ////////////////////////////////////////
 -- screen:clear()
 lcd.cls()
 
-oldPad = Controls.read()
-
--- padTimer = Timer.new();
-padTimer = Timer
-
-padTimerTime = 0
-padTimer:start()
-
--- ontimeoutTimer = Timer.new();
-ontimeoutTimer = Timer;
-
-
-ontimeoutTimerTime = 0
-if ( not _GLOBAL_isPC ) then
-  ontimeoutTimer:start()
-  -- on PSP : return currentTime / NOT time since start()
-  ontimeoutTimerTime = ontimeoutTimer:time()
-end
 
 OnInit()
 
@@ -942,68 +789,49 @@ OnInit()
 locked = false
 while true do
 
-  pad = Controls.read()
-  
-  -- BEWARE : PSP version "ignore" that Timer cf currentTimeMills... 
-  -- Lua Timer fixed
-  
-  -- and it's smoother !
-	if padTimer:time() >= padTimerTime+PAD_TIMER_VALUE and pad ~= oldPad then
-	--if pad ~= oldPad then
-
-		if pad:triangle() then
-		  __restart()
-	  --elseif not locked and ( pad:cross() or pad:circle() ) then
-	  --  OnKeyInput(KEY.PRESSED, KEY.ROTATE_PIECE)
-	  elseif not locked and ( pad:up() ) then
-	    OnKeyInput(KEY.PRESSED, KEY.SPEED_DOWN_PIECE)
-    elseif pad:left() then
-	    OnKeyInput(KEY.PRESSED, KEY.LEFT)
-    elseif pad:right() then
-	    OnKeyInput(KEY.PRESSED, KEY.RIGHT)
-		end
-		
-		if not locked and ( pad:cross() or pad:circle() ) then
-	    OnKeyInput(KEY.PRESSED, KEY.ROTATE_PIECE)
-		end
-		
-    --oldPad = pad
-    padTimer:start();
-    padTimerTime = padTimer:time()
-  end
-
-		if pad:cross() or pad:circle() or pad:up() then
-		  locked = true
-		else
-		  locked = false
-		end
 
 
--- moa : later : async thread ?  -> no : concurent acces enormous PBMs
--- moa : genre Ext_Scheduler = luajava.newInstance( "com.xtase.lua.hardware.object.Ext_LuaScheduler" )
---System.sleep( SYSTEM_SLEEP )
---OnTimeout()
- -- replaced by 
- 
- local okTimeOut = false
- --[[if ( _GLOBAL_isPC ) then
-   if ( ontimeoutTimer:time() >= SYSTEM_SLEEP ) then
-     okTimeOut = true
-   end
- else]]
-   -- on PSP : return currentTime / NOT time since start()
-   if ( ontimeoutTimer:time() >= ontimeoutTimerTime + SYSTEM_SLEEP ) then
-     ontimeoutTimerTime = ontimeoutTimer:time()
-     okTimeOut = true
-   end
- --[[end]]
- 
- if ( okTimeOut ) then
-   OnTimeout()
-   ontimeoutTimer:start()
- end
- 
+--print("Wait pad")
+
+local pads = pad.read()
+
+--print( pads )
+
+if ( pads.start ) then  
+  print("break")
+  break; 
+elseif pads.up then
+  OnKeyInput(KEY.PRESSED, KEY.SPEED_DOWN_PIECE)
+elseif pads.left then
+  --print("left")
+  OnKeyInput(KEY.PRESSED, KEY.LEFT)
+elseif pads.right then
+  --print("right")
+  OnKeyInput(KEY.PRESSED, KEY.RIGHT)
+elseif pads.A then
+  while ( pad.read().A ) do lcd.delay(20); end
+
+  --print("rotate")
+  OnKeyInput(KEY.PRESSED, KEY.ROTATE_PIECE)
+elseif pads.B then
+  print("pause")
+  while ( pad.read().B ) do lcd.delay(20); end
+  locked = not locked
+end
+
+
+lcd.delay(30)
+
+if (not locked) then
+ OnTimeout()
+end
  
  CTBL_Invalidate()
 end
 -- //////////////////////////////////////// 
+
+
+print("Bye.");
+
+-- pwr.exit()
+
