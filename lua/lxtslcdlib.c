@@ -81,6 +81,22 @@ static int lcd_rgb (lua_State *L) {
 	return 1;
 }
 
+static int lcd_dispStr (lua_State *L) {
+  const char *str = luaL_optstring(L, 1, NULL);
+  int x = (int)luaL_optinteger(L, 2, EXIT_SUCCESS);
+  int y = (int)luaL_optinteger(L, 3, EXIT_SUCCESS);
+  
+  int color = 1;
+  if (0 == lua_isinteger(L, 4)) {
+  	// ...
+  } else {
+  	color = (int)luaL_optinteger(L, 4, EXIT_SUCCESS);
+  }
+  
+  console.getScreen()->dispStr( (char*)str, x, y, color );
+  return 1;
+}
+
 
 static int lcd_print (lua_State *L) {
   const char *str = luaL_optstring(L, 1, NULL);
@@ -308,6 +324,7 @@ static const luaL_Reg xtslcdlib[] = {
   {"cls",     lcd_cls},
   {"blitt",   lcd_blitt},
   {"print",   lcd_print},
+  {"dispStr",   lcd_dispStr},
   
   {"cursor",  lcd_cursor},
   {"rgb",  lcd_rgb},

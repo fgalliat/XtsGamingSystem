@@ -145,6 +145,22 @@
         this->print((char*)"\n");
     }
 
+
+	void WiredScreen::dispStr(char* str, int x, int y, uint16_t color=CLR_WHITE) {
+    	if ( str == NULL ) { return; }
+    	int len = strlen( str );
+    	char ch;
+    	for(int i=0; i < len; i++) {
+    		if ( x >= SCREEN_WIDTH ) { break; }
+    		ch = str[i];
+    		if (! ( ch == '\n' ) || ( ch == '\r' ) || ( ch == '\b' ) ) {
+    	    	this->DrawChar( ch , x, y, color);
+    		}
+    		x += 6;
+    	}
+    }
+
+
 	// --------
 	#define SCREEN_MODE_128 0
 	#define SCREEN_MODE_160 1
