@@ -5,6 +5,12 @@ function halt()
     console.pwr.halt()
 end
 
+function _exit()
+    cls()
+    print("Bye !")
+    console.pwr.exit()
+end
+
 function refreshStatus()
     local connInfos = split( wifi.info(), ':' );
     local wifiConnected = connInfos[1];
@@ -76,7 +82,7 @@ CHOICES = {
                                                             {lbl="+NEW", script="wifiNew.lua"} } },
                                 { lbl="Halt",      code="halt()" },
                                 { lbl="Reboot",    code="console.pwr.reboot()" },
-                                { lbl="Exit",      code="console.pwr.exit()" }, 
+                                { lbl="Exit",      code="_exit()" }, 
                               } 
                             },
 
@@ -93,6 +99,24 @@ CHOICES = {
 
 function razScreen()
     lcd.rect(0,0,SCREEN_WIDTH, SCREEN_HEIGHT, 1, 3)
+end
+
+
+function waitAreleased()
+  while (true) do
+    if ( not pad.read().A ) then
+      break;
+    end
+    delay(50);
+  end
+end
+function waitBreleased()
+  while (true) do
+    if ( not pad.read().B ) then
+      break;
+    end
+    delay(50);
+  end
 end
 
 while true do
@@ -141,6 +165,7 @@ while true do
             CHOICE = CHOICE+1
         elseif ( pads.A ) then
             -- GOTO : subLevel
+            waitAreleased()
             break
         end
 
@@ -210,6 +235,8 @@ while true do
                     SUB_CHOICE = SUB_CHOICE + 1
                     break
                 elseif ( pads.A ) then
+                	waitAreleased()
+                
                     local subItem = curParentItem.items[SUB_CHOICE]
 
                     if ( subItem.code ~= nil ) then
@@ -243,6 +270,8 @@ while true do
 
                     break
                 elseif ( pads.B ) then
+                	waitBreleased()
+                	
                     SUB_LEVEL = SUB_LEVEL - 1;
                     if ( SUB_LEVEL < 1 ) then
                         doesReturn = true
