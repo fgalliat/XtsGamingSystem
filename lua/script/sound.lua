@@ -30,7 +30,7 @@ while( true ) do
   local pads = pad.read();
   waitPadReleased()
 
-print( snd.isPlaying() )
+-- print( snd.isPlaying() )
 
   if ( not pause ) then
 	  if ( not wasPlaying ) then
