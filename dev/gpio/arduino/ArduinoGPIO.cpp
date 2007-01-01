@@ -79,25 +79,24 @@ char *GpioOverArduino::readAllPins()
     static char CRLF[2] = {0x00, 0x00};
     memset(buffer, 0x00, 16 + 0 + 1);
 
-    // this->serial->writestr("SRM2"); // mode 2 (on demand)
-    this->serial->writestr("SRM"); // mode 2 (on demand)
-    delay(2);
-    this->serial->writestr("2");   // mode 2 (on demand)
+    this->serial->writestr("SRM2"); // mode 2 (on demand)
+    // this->serial->writestr("SRM"); // mode 2 (on demand)
+    // delay(2);
+    // this->serial->writestr("2");   // mode 2 (on demand)
 
     // TODO : lock Serial.write ....
 
     delay(80); // less time makes Serial Reading hanging
-    int readed = this->serial->read(buffer, 16);
+    int readed = this->serial->read(buffer, 16+1);
 
     // printf("f:%d bytes read\n", readed);
     // printf("s:%s bytes read\n", buffer);
 
-    if (readed != 16)
+    if (readed != 16+1)
     {
-        printf("Oups %d \n", readed);
+        // printf("Oups %d \n", readed);
         return NULL;
     }
-    this->serial->read(buffer, 1); // '\n'
 
 	delay(10);
 

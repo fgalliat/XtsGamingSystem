@@ -71,6 +71,9 @@ bool Pad::checkBtns()  {
 
 	#ifdef NEW_SERIAL_GPIO
 		char* banks = gpio.readAllPins();
+		if ( banks == NULL ) {
+			return false;
+		}
 
 		this->_btStart = gpio.isAButtonPressed(banks, BTN0_PIN);
 		this->_bt1 = gpio.isAButtonPressed(banks, BTN1_PIN);

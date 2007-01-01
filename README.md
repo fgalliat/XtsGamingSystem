@@ -30,6 +30,7 @@ Cross Platform Gaming System
 
 - demo runs ~well
 - lua reads keypad less often, but has more failures
+- SX over 328 works well even on minicom but not in App
 
 **Ideas**  
 
