@@ -149,11 +149,15 @@ bool XtsConsole::isInited() { return _consoleINITED; }
 
 bool XtsConsole::init()
 {
+	
+	screen.init();
+	screen.cls();
+	screen.drawPCT( "/BOOT.PCT", (320-160)/2, (240-128)/2 );
 
 	if (this->isLocked())
 	{
 		// need to re-init screen each time (arietta cf malloc / desktop cf WindowSDLPtr)
-		screen.init();
+		// screen.init(); // done upper
 
 #ifndef NEW_SERIAL_GPIO
 		// // what to do for GPIO (on arrieta via I2C !!!!!) ????
@@ -169,7 +173,7 @@ bool XtsConsole::init()
 
 	pwr.init(); // BEWARE !!!!!!!
 
-	screen.init();
+	// screen.init(); // done upper
 
 #ifndef NEW_SERIAL_GPIO
 	this->gpioOK = gpio.begin(0x3E) != 0;
