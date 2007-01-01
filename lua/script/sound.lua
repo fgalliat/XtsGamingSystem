@@ -24,6 +24,7 @@ function waitPadReleased()
 end
 
 local wasPlaying = false
+local pause = false
 
 while( true ) do
   local pads = pad.read();
@@ -31,15 +32,17 @@ while( true ) do
 
 print( snd.isPlaying() )
 
-  if ( not wasPlaying ) then
-    wasPlaying = snd.isPlaying()
-  else 
-  	if ( not snd.isPlaying() ) then
-  		snd.next()
-	    trckNum = snd.getTrackNum()
-	    lcd.print("Playing ".. snd.getTrackNum() .." ".. snd.getTrackName().."\n" )
-  		wasPlaying = false
-  	end
+  if ( not pause ) then
+	  if ( not wasPlaying ) then
+	    wasPlaying = snd.isPlaying()
+	  else 
+	  	if ( not snd.isPlaying() ) then
+	  		snd.next()
+		    trckNum = snd.getTrackNum()
+		    lcd.print("Playing ".. snd.getTrackNum() .." ".. snd.getTrackName().."\n" )
+	  		wasPlaying = false
+	  	end
+	  end
   end
 
 
@@ -47,11 +50,16 @@ print( snd.isPlaying() )
     break
   elseif ( pads.A ) then
     snd.next()
+    pause = false
     trckNum = snd.getTrackNum()
     lcd.print("Playing ".. snd.getTrackNum() .." ".. snd.getTrackName().."\n" )
+  elseif ( pads.B ) then
+  	snd.pause()
+  	pause = not pause
   elseif ( pads.right ) then
     trckNum = trckNum + 10
 	snd.play( trckNum )
+	pause = false
 	lcd.print("Playing ".. trckNum .." ".. snd.getTrackName().."\n" )
   elseif ( pads.down ) then
     vol = vol - 5

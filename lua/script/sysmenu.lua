@@ -93,11 +93,12 @@ CHOICES = {
                                                            {lbl="Raycast", script="rcmoa.lua"}, 
                                                            {lbl="Tetris",   script="tetris.lua"}, 
                                                            {lbl="OutRun",   script="outrun.lua"}, 
+                                                           {lbl="OldSchool",   script="oldschool.lua"}, 
                                                            {lbl="Sound",   script="sound.lua"} } },
                                 { lbl="Native >",  items={} },
                                 { lbl="Bash",      exec="/bin/bash" } } },
 
-    { title="Zik",      items={ { lbl="Jukebox",   script="jukebox.lua" } } }
+    { title="Zik",      items={ { lbl="Jukebox",   script="sound.lua" } } }
 }
 
 function razScreen()
