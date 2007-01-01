@@ -23,10 +23,25 @@ function waitPadReleased()
   end
 end
 
+local wasPlaying = false
 
 while( true ) do
   local pads = pad.read();
   waitPadReleased()
+
+print( snd.isPlaying() )
+
+  if ( not wasPlaying ) then
+    wasPlaying = snd.isPlaying()
+  else 
+  	if ( not snd.isPlaying() ) then
+  		snd.next()
+	    trckNum = snd.getTrackNum()
+	    lcd.print("Playing ".. snd.getTrackNum() .." ".. snd.getTrackName().."\n" )
+  		wasPlaying = false
+  	end
+  end
+
 
   if ( pads.start ) then
     break

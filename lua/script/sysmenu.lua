@@ -79,6 +79,7 @@ CHOICES = {
     { title="Settings", items={ { lbl="WiFi",      items={  {lbl="UP",   code="console.wifi.up()"}, 
                                                             {lbl="DOWN", code="console.wifi.down()"}, 
                                                             {lbl="SHOW", code="showWifi()"}, 
+                                                            {lbl="RESTART", code="console.wifi.restart()"}, 
                                                             {lbl="+NEW", script="wifiNew.lua"} } },
                                 { lbl="Halt",      code="halt()" },
                                 { lbl="Reboot",    code="console.pwr.reboot()" },

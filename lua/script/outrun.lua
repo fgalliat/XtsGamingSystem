@@ -408,14 +408,16 @@ gc = {
 
 function main()
   print("Let's go !")
+  lcd.rect(0,0,320,240,1,8)
   
   snd.stop() 
   -- snd.setvolume(40)
   lcd.delay(100)
   --snd.pause()
+  snd.setvolume(20)
+  lcd.delay(1000) -- need a long pause after setvolume
+  
   snd.play(58) -- MotorHead Theme
-  lcd.delay(700)
-  snd.setvolume(25)
   --snd.pause() -- else music don't starts
   
   start()
