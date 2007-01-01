@@ -39,7 +39,7 @@ float rnd(float d1) {
 
 
 
-void drawStarFieldFrame(WiredScreen* screen);
+void drawStarFieldFrame(WiredScreen* screen, int mode=1);
 
 
 
@@ -49,8 +49,8 @@ void setupBCK(WiredScreen* screen) {
 
 void loopBCK(WiredScreen* screen) {
  //screen.blitt(0);
- if (mode ==1) screen->cls();
- drawStarFieldFrame(screen);
+ //if (mode ==1) screen->cls();
+ drawStarFieldFrame(screen, 0);
  //screen.blitt(2);
 }
 
@@ -84,13 +84,13 @@ static Star starfield[ size ];
 void createStar(int i);
 void initStars();
 
-void drawStarFieldFrame(WiredScreen* screen) {
+void drawStarFieldFrame(WiredScreen* screen, int mode) {
   if ( !inited ) {
     initStars();
     inited = true;
   }
-
-  // screen.cls();
+  
+  if (mode ==1) screen->cls();
   
   for(int i=0; i < size; i++) {
     if ( starfield[i].z <= speed ) {

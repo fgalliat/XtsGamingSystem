@@ -722,7 +722,7 @@
     void WiredScreen::drawAnimatedBackground(int mode, int m1, int m2, int m3, int m4) {
     	
     	if ( mode == 1 ) {
-    		drawStarFieldFrame(this);
+    		drawStarFieldFrame(this, m1);
     	}
     	
         // int len = 1; txBuff[0] = 0x61; 
