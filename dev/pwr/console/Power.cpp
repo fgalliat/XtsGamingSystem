@@ -9,12 +9,14 @@
 
 void Power::halt() {
     stopTickThread();
-    printf("FAKE HALT\n");
+    // printf("FAKE HALT\n");
+    system("halt");
     ::exit(0);
 }
 
 void Power::reboot() {
     stopTickThread();
-    printf("FAKE REBOOT\n");
+    // printf("FAKE REBOOT\n");
+    system("reboot");
     ::exit(0);
 }
