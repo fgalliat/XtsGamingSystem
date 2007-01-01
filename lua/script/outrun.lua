@@ -409,6 +409,15 @@ gc = {
 function main()
   print("Let's go !")
   
+  snd.stop() 
+  -- snd.setvolume(40)
+  lcd.delay(100)
+  --snd.pause()
+  snd.play(58) -- MotorHead Theme
+  lcd.delay(700)
+  snd.setvolume(25)
+  --snd.pause() -- else music don't starts
+  
   start()
   
   while( true ) do
@@ -444,6 +453,8 @@ on_paint( gc )
     
     lcd.delay(30)
   end
+  
+  snd.stop()
   
 end
 
