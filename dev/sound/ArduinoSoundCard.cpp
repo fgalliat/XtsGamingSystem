@@ -202,6 +202,7 @@ bool SoundCard::init()
 
 	this->stop();
 	this->volume(_snd_vol);
+	_snd_isPlaying = false;
 }
 void SoundCard::close()
 {
@@ -224,6 +225,7 @@ void SoundCard::play(int track)
 	char msg[16];
 	sprintf(msg, "MPL%d", track);
 	this->serial->write(msg, strlen(msg));
+	_snd_isPlaying = true;
 	delay(100);
 }
 
@@ -274,6 +276,7 @@ void SoundCard::next()
 	_snd_trackNum++;
 	// execute_CMD(this->serial, 0x01,0,1);
 	this->serial->writestr("MNX");
+	_snd_isPlaying = true;
 	delay(100);
 }
 void SoundCard::prev()
@@ -281,6 +284,7 @@ void SoundCard::prev()
 	_snd_trackNum--; // TODO : optional mod to _snd_trackNb
 					 // execute_CMD(this->serial, 0x02,0,1);
 	this->serial->writestr("MPV");
+	_snd_isPlaying = true;
 	delay(100);
 }
 

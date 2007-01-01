@@ -147,12 +147,19 @@ Power *XtsConsole::getPowerManager() { return &pwr; }
 
 bool XtsConsole::isInited() { return _consoleINITED; }
 
+
+void __splash(bool start) {
+	screen.cls();
+	screen.drawPCT( "/BOOT.PCT", (320-160)/2, (240-128)/2 );
+}
+
 bool XtsConsole::init()
 {
 	
 	screen.init();
-	screen.cls();
-	screen.drawPCT( "/BOOT.PCT", (320-160)/2, (240-128)/2 );
+	// -== Boot Splash ==-
+	__splash(true);
+
 
 	if (this->isLocked())
 	{
@@ -220,6 +227,11 @@ bool XtsConsole::init()
 
 static void __xtsc_doClose(XtsConsole *console)
 {
+	// -== Halt Splash ==-
+	__splash(false);
+	
+	console->getSoundCard()->stop();
+	
 	if (!console->isLocked())
 	{
 		console->getSoundCard()->close();
@@ -302,10 +314,11 @@ bool XtsConsole::volume(int volume)
 	{
 		return false;
 	}
-	snd.volume(volume * 100 / 30);
+	// snd.volume(volume * 100 / 30);
+	snd.volume(volume);
 	return true;
 }
-int XtsConsole::getVolume(int volume) { return snd.getVolume() * 100 / 30; }
+int XtsConsole::getVolume(int volume) { return snd.getVolume() /* * 100 / 30 */; }
 
 void XtsConsole::cls() { screen.cls(); }
 
