@@ -49,7 +49,7 @@
 // ========================================
 int _k_KEYS = 0;
 
-void *keyThread(void *argument){
+void *_xts_keyThread(void *argument){
   
   while( true ) {
 
@@ -178,7 +178,7 @@ void *keyThread(void *argument){
 
         pthread_t thread1;
 
-        int i1 = pthread_create( &thread1, NULL, keyThread, (void*) NULL);
+        int i1 = pthread_create( &thread1, NULL, _xts_keyThread, (void*) NULL);
         // pthread_join(thread1,NULL);
 
     }
