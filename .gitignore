@@ -1,0 +1,12 @@
+_trash
+**/roms/*
+**/build/*
+*.o
+*~
+*.log
+demo
+xgb
+xnes
+lua/lua
+laines
+mainSnd
