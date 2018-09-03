@@ -58,6 +58,9 @@ LUAMOD_API int (luaopen_xtssnd) (lua_State *L);
 #define LUA_PADLIBNAME	"pad"
 LUAMOD_API int (luaopen_xtspad) (lua_State *L);
 
+#define LUA_WIFILIBNAME	"wifi"
+LUAMOD_API int (luaopen_xtswifi) (lua_State *L);
+
 
 
 /* open all previous libraries */

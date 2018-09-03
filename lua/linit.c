@@ -58,6 +58,7 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_LCDLIBNAME, luaopen_xtslcd},
   {LUA_SNDLIBNAME, luaopen_xtssnd},
   {LUA_PADLIBNAME, luaopen_xtspad},
+  {LUA_WIFILIBNAME, luaopen_xtswifi},
 
 
   {NULL, NULL}

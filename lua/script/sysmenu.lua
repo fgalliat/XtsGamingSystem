@@ -5,15 +5,59 @@ function halt()
     os.exit()
 end
 
+function refreshStatus()
+    local connInfos = split( wifi.info(), ':' );
+    local wifiConnected = connInfos[1];
+    local wifiESSID = connInfos[2];
+    local wifiIP = connInfos[3];
+    --[[ print( "Connected > ".. wifiConnected );
+    print( "ESSID     > ".. wifiESSID );
+    print( "IP        > ".. wifiIP ); ]]--
+
+    console.screen.cursor( 49, 0 );
+    if ( wifiConnected == "1" ) then
+        console.screen.print( "[W]" )
+    else
+        console.screen.print( "[/]" )
+    end
+end
+
+function showWifi()
+    razScreen();
+
+    local connInfos = split( wifi.info(), ':' );
+    local wifiConnected = connInfos[1];
+    local wifiESSID = connInfos[2];
+    local wifiIP = connInfos[3];
+
+    console.screen.cursor( 15, 15 );
+    if ( wifiConnected == "1" ) then
+        console.screen.print( "Wifi Connected" )
+        console.screen.cursor( 15, 15+1 );
+        console.screen.print( "ESSID : ".. wifiESSID )
+        console.screen.cursor( 15, 15+1+1 );
+        console.screen.print( "IP    : ".. wifiIP )
+    else
+        console.screen.print( "Wifi not Connected" )
+    end
+
+
+    while( not console.pad.read().start ) do
+        delay(100);
+    end
+
+    delay(250);
+
+end
 
 
 SPR_SIZE = 64
 CHOICE = 1
 
 CHOICES = {
-    { title="Settings", items={ { lbl="WiFi",      items={  {lbl="UP",   script="wifiUp.lua"}, 
-                                                            {lbl="DOWN", script="wifiDown.lua"}, 
-                                                            {lbl="SHOW", script="wifiShow.lua"}, 
+    { title="Settings", items={ { lbl="WiFi",      items={  {lbl="UP",   code="console.wifi.up()"}, 
+                                                            {lbl="DOWN", code="console.wifi.down()"}, 
+                                                            {lbl="SHOW", code="showWifi()"}, 
                                                             {lbl="+NEW", script="wifiNew.lua"} } },
                                 { lbl="Halt",      code="halt()" } } },
 
@@ -33,8 +77,8 @@ end
 
 while true do
 
-    --lcd.rect(0,0,SCREEN_WIDTH, SCREEN_HEIGHT, 1, 3)
     razScreen()
+    refreshStatus()
 
     -- Settings
     lcd.sprite( "/SYSMENU.PCT", ((SCREEN_WIDTH-SPR_SIZE)/2), ((SCREEN_HEIGHT-SPR_SIZE)/2), SPR_SIZE, SPR_SIZE, SPR_SIZE, 0 )
@@ -109,6 +153,7 @@ while true do
         local curParentItem = megaItem;
 
         drawSubMenu( curParentItem );
+        refreshStatus()
 
         while (not doesQuit) do
 
@@ -159,6 +204,7 @@ while true do
                         SUB_LEVEL = SUB_LEVEL + 1;
                         curParentItem = subItem;
                         drawSubMenu( curParentItem );
+                        refreshStatus()
                         break; -- enter in it....
 
                     elseif ( subItem.exec ~= nil ) then
@@ -173,6 +219,7 @@ while true do
 
                     razScreen()
                     drawSubMenu( curParentItem );
+                    refreshStatus()
 
                     break
                 elseif ( pads.B ) then
