@@ -5,6 +5,6 @@ ARCH="XTSCONSOLE"
 ## MY_PC -> /vm_mnt/dat2 instead of /vm_mnt/data
 #DIRECTIVES="-DMY_PC"
 
-CPPs="dev/screen/wiredSPI/SPIWiredScreen.cpp dev/sound/DFSoundCard.cpp dev/serial/Serial.cpp dev/gpio/sx1509/SparkFunSX1509.cpp XtsConsole.cpp"
+CPPs="dev/screen/wiredSPI/SPIWiredScreen.cpp dev/sound/DFSoundCard.cpp dev/serial/Serial.cpp dev/gpio/sx1509/SparkFunSX1509.cpp dev/wifi/AriettaG25_WiFi.cpp XtsConsole.cpp"
 
 LIBS=""

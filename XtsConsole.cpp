@@ -37,6 +37,8 @@ static auto gpio = SX1509();
 
 static Pad pad = Pad();
 
+static WiFi wifi = WiFi();
+
 // ==================================================
 
 static bool _consoleINITED = false;
@@ -154,11 +156,11 @@ bool Pad::checkBtns()  {
     
     // make a WIFI class too !!
     
-    bool  XtsConsole::startupWIFI()  { printf("-Start WIFI-\n"); return true; }
-    bool  XtsConsole::shutdownWIFI() { printf("-Stop WIFI-\n"); return true; }
-    bool  XtsConsole::restartWIFI()  { printf("-Restart WIFI-\n"); return true; }
-    bool  XtsConsole::isOnWIFI()     { return true; }
-    char* XtsConsole::getIP()        { return (char*)"127.0.0.1"; }
-    char* XtsConsole::getESSID()     { return (char*)"NoNetwork"; }
+    bool  XtsConsole::startupWIFI()  { return wifi.up(); }
+    bool  XtsConsole::shutdownWIFI() { wifi.down(); return true; }
+    bool  XtsConsole::restartWIFI()  { return wifi.restart(); }
+    bool  XtsConsole::isOnWIFI()     { return wifi.isConnected(); }
+    char* XtsConsole::getInfos()     { return wifi.getInfos(); }
+    char* XtsConsole::getList()      { return wifi.getList(); }
 
 

@@ -12,4 +12,6 @@
 
 #include "./screen/wiredSPI/WiredScreen.h"
 
+#include "./wifi/Wifi.h"
+
 

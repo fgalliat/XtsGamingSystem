@@ -108,8 +108,8 @@ class XtsConsole {
     bool  shutdownWIFI() ;
     bool  restartWIFI()  ;
     bool  isOnWIFI()     ;
-    char* getIP()        ;
-    char* getESSID()     ;
+    char* getInfos()     ;
+    char* getList()      ;
 };
 
 

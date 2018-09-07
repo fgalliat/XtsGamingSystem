@@ -5,6 +5,6 @@ ARCH="DESKTOP"
 # MY_PC -> /vm_mnt/dat2 instead of /vm_mnt/data
 DIRECTIVES="-DMY_PC"
 
-CPPs="dev/screen/sdl2/SDL2WiredScreen.cpp dev/sound/MPG123SoundCard.cpp dev/serial/Serial.cpp dev/gpio/desktop/FakeGPIO.cpp XtsConsole.cpp" 
+CPPs="dev/screen/sdl2/SDL2WiredScreen.cpp dev/sound/MPG123SoundCard.cpp dev/serial/Serial.cpp dev/gpio/desktop/FakeGPIO.cpp dev/wifi/AriettaG25_WiFi.cpp XtsConsole.cpp" 
 
 LIBS="-lSDL2 -lpthread"
