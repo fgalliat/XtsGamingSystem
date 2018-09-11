@@ -42,9 +42,9 @@ bool _w_connected = false;
 
 // wifi > UP
 static int wifi_up (lua_State *L) {
-	printf("(WIFI) UP\n");
-
-	_w_connected = true;
+	// printf("(WIFI) UP\n");
+	_w_connected = console.startupWIFI();
+	// _w_connected = true;
 
 	lua_pushboolean(L, _w_connected);
 
@@ -53,8 +53,8 @@ static int wifi_up (lua_State *L) {
 
 // wifi > DOWN
 static int wifi_down (lua_State *L) {
-	printf("(WIFI) DOWN\n");
-
+	// printf("(WIFI) DOWN\n");
+	console.shutdownWIFI();
 	_w_connected = false;
 
 	lua_pushboolean(L, _w_connected);
@@ -64,9 +64,9 @@ static int wifi_down (lua_State *L) {
 
 // wifi > RESTART
 static int wifi_restart (lua_State *L) {
-	printf("(WIFI) RESTART\n");
-
-	_w_connected = true;
+	// printf("(WIFI) RESTART\n");
+	_w_connected = console.restartWIFI();
+	// _w_connected = true;
 
 	lua_pushboolean(L, _w_connected);
 
@@ -75,11 +75,13 @@ static int wifi_restart (lua_State *L) {
 
 // list registered networks (not scanned ones)
 static int wifi_list (lua_State *L) {
-	char infos[1024];
+	// char infos[1024];
 
-	strcpy(infos, "Lvb-XXXX"); strcat(infos, ":"); 
-	strcat(infos, "AndroidAP"); strcat(infos, ":"); 
-	strcat(infos, "AI-Tinker"); strcat(infos, ":"); 
+	// strcpy(infos, "Lvb-XXXX"); strcat(infos, ":"); 
+	// strcat(infos, "AndroidAP"); strcat(infos, ":"); 
+	// strcat(infos, "AI-Tinker"); strcat(infos, ":"); 
+
+	char* infos = console.getWIFIList();
 
 	lua_pushstring(L, infos);
 	return 1;
@@ -110,13 +112,15 @@ static int wifi_remove (lua_State *L) {
 
 // @ this time : returns a concat str / LATER see for an object
 static int wifi_info (lua_State *L) {
-	char infos[256];
+	// char infos[256];
 
-	strcpy(infos, _w_connected ? "1" : "0" );
-	strcat(infos, ":" );
-	strcat(infos, _w_connected ? "F??Kbox-XXX" : "NULL" );
-	strcat(infos, ":" );
-	strcat(infos, _w_connected ? "192.168.1.254" : "0.0.0.0" );
+	// strcpy(infos, _w_connected ? "1" : "0" );
+	// strcat(infos, ":" );
+	// strcat(infos, _w_connected ? "F??Kbox-XXX" : "NULL" );
+	// strcat(infos, ":" );
+	// strcat(infos, _w_connected ? "192.168.1.254" : "0.0.0.0" );
+
+	char* infos = console.getWIFIInfos();
 
 	lua_pushstring(L, infos);
 	return 1;

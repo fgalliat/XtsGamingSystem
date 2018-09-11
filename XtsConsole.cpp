@@ -160,7 +160,7 @@ bool Pad::checkBtns()  {
     bool  XtsConsole::shutdownWIFI() { wifi.down(); return true; }
     bool  XtsConsole::restartWIFI()  { return wifi.restart(); }
     bool  XtsConsole::isOnWIFI()     { return wifi.isConnected(); }
-    char* XtsConsole::getInfos()     { return wifi.getInfos(); }
-    char* XtsConsole::getList()      { return wifi.getList(); }
+    char* XtsConsole::getWIFIInfos()     { return wifi.getInfos(); }
+    char* XtsConsole::getWIFIList()      { return wifi.getList(); }
 
 
