@@ -2,7 +2,7 @@ cls()
 
 function halt()
     print("Bye !")
-    os.exit()
+    console.pwr.halt()
 end
 
 function refreshStatus()
@@ -20,6 +20,21 @@ function refreshStatus()
     else
         console.screen.print( "[/]" )
     end
+
+    local battTime = console.pwr.time();
+    local battMin  = math.fmod( battTime ,  60 );
+    local battHour = math.floor( battTime / 60 );
+    local battMinStr = ""..battMin;
+    if ( battMin < 10 ) then
+      battMinStr = "0"..battMinStr
+    end
+
+    console.screen.cursor( 40, 0 );   console.screen.print( battHour )
+    console.screen.cursor( 40+1, 0 ); console.screen.print( ":" )
+    console.screen.cursor( 40+2, 0 ); console.screen.print( battMinStr )
+
+    -- console.screen.cursor( 30, 0 );   console.screen.print( battTime )
+
 end
 
 function showWifi()
@@ -59,7 +74,11 @@ CHOICES = {
                                                             {lbl="DOWN", code="console.wifi.down()"}, 
                                                             {lbl="SHOW", code="showWifi()"}, 
                                                             {lbl="+NEW", script="wifiNew.lua"} } },
-                                { lbl="Halt",      code="halt()" } } },
+                                { lbl="Halt",      code="halt()" },
+                                { lbl="Reboot",    code="console.pwr.reboot()" },
+                                { lbl="Exit",      code="console.pwr.exit()" }, 
+                              } 
+                            },
 
     { title="Apps",     items={ { lbl="Console >", items={ {lbl="GB",  exec="../gb/xgb"}, 
                                                            {lbl="NES", exec="../nes/xnes ../nes/roms/Dr.\\ Mario\\ \\(E\\)\\ \\[\\!\\].nes"} } },

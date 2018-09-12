@@ -35,7 +35,8 @@ console = {
     screen=lcd,
     wifi=wifi,
     snd=snd,
-    pad=pad
+    pad=pad,
+    pwr=pwr
 }
 
 SCRIPT_PATH = "./script/"

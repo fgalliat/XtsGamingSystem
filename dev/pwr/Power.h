@@ -85,15 +85,17 @@
        }
 
        static void *_xts_battThread(void *context){
-          while(inRun) {
-            if ( !inPause ) {
-                ((Power*)context)->incBattTimer();
+          Power* _this = ((Power*)context);
+          while(_this->inRun) {
+            if ( !_this->inPause ) {
+                _this->incBattTimer();
                 printf("BATT TICK !\n");
             }
-            delay( ACCURACY * 60 * 1000 );
+            delay( _this->ACCURACY * 60 * 1000 ); // 5min
+            // delay( _this->ACCURACY * 1000 ); // 5sec
           }
-          inRun = false;
-          inPause = false;
+          _this->inRun = false;
+          _this->inPause = false;
        }
 
 
@@ -114,7 +116,7 @@
        }
      public:
        Power() {}
-       ~Power();
+       ~Power() {}
 
        void init() {
             // not in constructor (to be not called if console already started)

@@ -38,11 +38,9 @@ lualib.h to define lib
 extern XtsConsole console;
 // -------------------------------------------
 
-bool _w_connected = false;
-
 // battery time from discharging > in minutes (5min accurate)
 static int pwr_time (lua_State *L) {
-	int time = console.getPower()->getTime();
+	int time = console.getPowerManager()->getTime();
 
 	lua_pushinteger(L, time);
 
@@ -50,8 +48,8 @@ static int pwr_time (lua_State *L) {
 }
 
 // reset the battery timer > 
-static int wifi_down (lua_State *L) {
-	console.getPower()->resetTime();
+static int pwr_resetTime (lua_State *L) {
+	console.getPowerManager()->resetTime();
 
 	lua_pushboolean(L, true);
 
@@ -60,7 +58,7 @@ static int wifi_down (lua_State *L) {
 
 // halt the system
 static int pwr_halt (lua_State *L) {
-	console.halt();
+	console.shutdown();
 
 	lua_pushboolean(L, true);
 
@@ -69,7 +67,7 @@ static int pwr_halt (lua_State *L) {
 
 // reboot the system
 static int pwr_reboot (lua_State *L) {
-	console.reboot();
+	console.reset();
 
 	lua_pushboolean(L, true);
 
@@ -78,7 +76,7 @@ static int pwr_reboot (lua_State *L) {
 
 // exit the system > return to bash
 static int pwr_exit (lua_State *L) {
-	console.exit();
+	console.close();
 
 	lua_pushboolean(L, true);
 
