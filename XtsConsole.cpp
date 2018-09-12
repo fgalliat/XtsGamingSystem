@@ -39,6 +39,8 @@ static Pad pad = Pad();
 
 static WiFi wifi = WiFi();
 
+static Power pwr = Power();
+
 // ==================================================
 
 static bool _consoleINITED = false;
@@ -78,10 +80,13 @@ bool Pad::checkBtns()  {
     Pad*         XtsConsole::readPad() { pad.checkBtns(); return &pad; }
     Pad*         XtsConsole::getPad() { return &pad; }
 
+	Power* XtsConsole::getPowerManager() { return &pwr; }
 
 	bool XtsConsole::isInited() { return _consoleINITED; }
 
     bool XtsConsole::init() {
+		pwr.init(); // BEWARE !!!!!!!
+
     	screen.init();
     	
     	snd.init();
@@ -112,29 +117,35 @@ bool Pad::checkBtns()  {
 
     	return true;
     }
-    
+
+    static void __xtsc_doClose(XtsConsole* console) {
+		console->getSoundCard()->close();
+    	
+    	console->led(false);
+    	//gpio.close();
+    	
+    	console->getScreen()->close();
+	}
+
+
     void XtsConsole::led(bool state) {
     	if ( this->gpioOK ) {
     		gpio.digitalWrite(LED0_PIN, state ? HIGH : LOW);
     	}
     }
-    
-    
+
+	// ===========================
+
     void XtsConsole::close() {
-    	snd.close();
-    	
-    	this->led(false);
-    	//gpio.close();
-    	
-    	screen.close();
-    	
-    	exit(0); // ??
+    	__xtsc_doClose(this);
+    	pwr.exit();
     }
     
-    void XtsConsole::shutdown() { printf("-SHUTDOWN-\n"); }
-    void XtsConsole::reset()    { printf("-REBOOT-\n"); }
-    
 
+    void XtsConsole::shutdown() { __xtsc_doClose(this); pwr.halt(); }
+    void XtsConsole::reset()    { __xtsc_doClose(this); pwr.reboot(); }
+    
+	
     
     // ===========================
 
@@ -153,8 +164,6 @@ bool Pad::checkBtns()  {
     void XtsConsole::cls() { screen.cls(); }
     
     // ===========================
-    
-    // make a WIFI class too !!
     
     bool  XtsConsole::startupWIFI()  { return wifi.up(); }
     bool  XtsConsole::shutdownWIFI() { wifi.down(); return true; }

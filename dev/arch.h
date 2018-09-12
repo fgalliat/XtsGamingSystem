@@ -14,4 +14,6 @@
 
 #include "./wifi/Wifi.h"
 
+#include "./pwr/Power.h"
+
 

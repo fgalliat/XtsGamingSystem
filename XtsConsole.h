@@ -83,6 +83,8 @@ class XtsConsole {
     
     Pad*         readPad();
     Pad*         getPad();
+
+    Power* getPowerManager();
     
     // ===========================
     
