@@ -8,6 +8,7 @@
  * 
  **/
 
+#include <sys/stat.h> // for mkdir
 
   class Power {
      private:
@@ -17,13 +18,56 @@
        const int ACCURACY = 5; // 5min accurate
        int _time = -1;
 
+       const char* BATT_LOG_FILE = "/vm_mnt/log/battery.log";
+
+       void createLogDir() {
+          // S_IRWXU => chmod 7
+          // S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH => 775
+          const int dir_err = mkdir("/vm_mnt/log", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        //   if (-1 == dir_err) {
+        //     printf("Error creating LOG directory! \n");
+        //     exit(1);
+        //   }
+       }
+
        void writeBattTimerFile(int value) {
-           ...;
+            createLogDir();
+            FILE *f = fopen(BATT_LOG_FILE, "w");
+            if (f == NULL) {
+                printf("(!!) Error opening BATTERY-LOG file!\n");
+                // _time = 999; // just not saving time
+                return;
+            }
+
+            fprintf(f, "%d", value);
+
+            fclose(f);
        }
 
 
        int readBattTimerFile() {
-           _time = ...;
+           createLogDir();
+            char num[16];
+            int numCpt = 0;
+
+            FILE *f = fopen(BATT_LOG_FILE, "r");
+            if (f == NULL) {
+                _time = 0; // BEWARE w/ risk of an infinite loop
+                return _time;
+            }
+
+            while(true) {
+                char ch = fgetc(f);
+                if ( ch == EOF || ch == '\n' ) {
+                    break;
+                }
+                num[numCpt++] = ch;
+            }
+            num[numCpt++] = 0x00;
+
+            fclose(f);
+
+           _time = atoi(num);
            return _time;
        }
 
@@ -45,8 +89,8 @@
             if ( !inPause ) {
                 ((Power*)context)->incBattTimer();
                 printf("BATT TICK !\n");
-                delay( ACCURACY * 60 * 1000 );
             }
+            delay( ACCURACY * 60 * 1000 );
           }
           inRun = false;
           inPause = false;
