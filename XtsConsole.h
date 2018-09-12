@@ -69,6 +69,8 @@ class XtsConsole {
     XtsConsole() {}
     ~XtsConsole() {}
     
+    long long now();
+
     bool isInited();
 
     bool init();

@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 
-
+#include <sys/time.h>
 
 #include "./XtsConsole.h"
 
@@ -144,7 +144,20 @@ bool Pad::checkBtns()  {
 
     void XtsConsole::shutdown() { __xtsc_doClose(this); pwr.halt(); }
     void XtsConsole::reset()    { __xtsc_doClose(this); pwr.reboot(); }
-    
+
+    // ===========================
+
+
+
+
+	long long XtsConsole::now() {
+		struct timeval te; 
+		gettimeofday(&te, NULL); // get current time
+		long long milliseconds = te.tv_sec*1000LL + te.tv_usec/1000; // calculate milliseconds
+		// printf("milliseconds: %lld\n", milliseconds);
+		return milliseconds;
+	}
+
 	
     
     // ===========================
