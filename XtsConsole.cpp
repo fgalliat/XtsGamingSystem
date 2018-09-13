@@ -90,7 +90,9 @@ bool Pad::checkBtns()  {
 			// need to re-init screen each time (arietta cf malloc / desktop cf WindowSDLPtr)
 			screen.init();
 
-			// what to do for GPIO (on arrieta via I2C !!!!!)
+			// what to do for GPIO (on arrieta via I2C !!!!!) ????
+			this->gpioOK = gpio.begin(0x3E) != 0;
+    		_gpioOK = this->gpioOK;
 
 			_consoleINITED = true;
 			return;
