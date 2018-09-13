@@ -59,16 +59,63 @@
 
 #define LED1_PIN  0x09
 
-
+#define CONSOLE_STATUS_NOT_STARTED 0
+#define CONSOLE_STATUS_STARTED 1
 
 class XtsConsole {
   private:
-	bool gpioOK = true;
+	  bool gpioOK = true;
+
+    const char* CONSOLE_LOCK_FILE = "/vm_mnt/lock/XtsConsole.lock";
+
+    void writeConsoleLockFile(int status) {
+        // createLogDir();
+        FILE *f = fopen(CONSOLE_LOCK_FILE, "w");
+        if (f == NULL) {
+            printf("(!!) Error writing CONSOLE-LOCK file [%s]!\n", CONSOLE_LOCK_FILE);
+            return;
+        }
+
+        fprintf(f, "%d", status);
+
+        fclose(f);
+
+        printf("(ii) Locked Console Process!\n");
+    }
+
+
+    int readConsoleLockFile() {
+        //  createLogDir();
+        char num[16];
+        int numCpt = 0;
+
+        FILE *f = fopen(CONSOLE_LOCK_FILE, "r");
+        if (f == NULL) {
+            return 0;
+        }
+
+        while(true) {
+            char ch = fgetc(f);
+            if ( ch == EOF || ch == '\n' ) {
+                break;
+            }
+            num[numCpt++] = ch;
+        }
+        num[numCpt++] = 0x00;
+
+        fclose(f);
+
+        int status = atoi(num);
+        return status;
+    }
+
 
   public:
     XtsConsole() {}
     ~XtsConsole() {}
     
+    bool isLocked() { return readConsoleLockFile() > CONSOLE_STATUS_NOT_STARTED; }
+
     long long now();
 
     bool isInited();

@@ -85,6 +85,17 @@ bool Pad::checkBtns()  {
 	bool XtsConsole::isInited() { return _consoleINITED; }
 
     bool XtsConsole::init() {
+
+		if ( this->isLocked() ) {
+			// need to re-init screen each time (arietta cf malloc / desktop cf WindowSDLPtr)
+			screen.init();
+
+			// what to do for GPIO (on arrieta via I2C !!!!!)
+
+			_consoleINITED = true;
+			return;
+		}
+
 		pwr.init(); // BEWARE !!!!!!!
 
     	screen.init();
@@ -113,17 +124,20 @@ bool Pad::checkBtns()  {
     	
     	this->led(true);
     	
+		writeConsoleLockFile( CONSOLE_STATUS_STARTED );
+
 		_consoleINITED = true;
 
     	return true;
     }
 
     static void __xtsc_doClose(XtsConsole* console) {
-		console->getSoundCard()->close();
-    	
-    	console->led(false);
-    	//gpio.close();
-    	
+		if ( ! console->isLocked() ) {
+			console->getSoundCard()->close();
+			
+			console->led(false);
+			//gpio.close();
+		}
     	console->getScreen()->close();
 	}
 
