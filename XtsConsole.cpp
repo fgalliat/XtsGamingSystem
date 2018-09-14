@@ -95,7 +95,7 @@ bool Pad::checkBtns()  {
     		_gpioOK = this->gpioOK;
 
 			_consoleINITED = true;
-			return;
+			return true;
 		}
 
 		pwr.init(); // BEWARE !!!!!!!
