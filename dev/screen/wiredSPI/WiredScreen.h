@@ -9,6 +9,16 @@
 #define CLR_BLUE  rgb16(0,0,255)
 #define CLR_BLACK 0
 #define CLR_WHITE rgb16(255,255,255)
+
+#define CLR_LIGHTGRAY rgb16(200,200,200)
+#define CLR_GRAY      rgb16(128,128,128)
+#define CLR_DARKGRAY  rgb16(50,50,50)
+
+#define CLR_LIGHTGREEN rgb16(150,255,150)
+#define CLR_DARKGREEN  rgb16(0,150,0)
+
+
+
 //#define CLR_WHITE 0xFFFF
 
 #define SCREEN_WIDTH 320

@@ -516,6 +516,24 @@
             // int g = rand()%32;
             // int r = (31-(y-50)/16)%32;    // A lot of red
             // unsigned short int t = r<<11 | g << 5 | b;
+
+
+            // since 18/09/2018
+            if ( color < 10 ) {
+                
+                     if ( color == 0 ) { color = CLR_BLACK; }
+                else if ( color == 1 ) { color = CLR_WHITE; }
+                else if ( color == 2 ) { color = CLR_LIGHTGRAY; }
+                else if ( color == 3 ) { color = CLR_GRAY; }
+                else if ( color == 4 ) { color = CLR_DARKGRAY; }
+
+                else if ( color == 5 ) { color = CLR_LIGHTGREEN; }
+                else if ( color == 6 ) { color = CLR_GREEN; }
+                else if ( color == 7 ) { color = CLR_DARKGREEN; }
+
+                else if ( color == 8 ) { color = CLR_PINK; }
+            }
+
             unsigned short int t = color;
             *((unsigned short int*)(fbp + location)) = t;
         #endif
