@@ -38,10 +38,10 @@ lualib.h to define lib
 #include "../XtsConsole.h"
 XtsConsole console;
 
-#define CLR_PINK  8
-#define CLR_GREEN 6
-#define CLR_BLACK 0
-#define CLR_WHITE 1
+// #define CLR_PINK  8
+// #define CLR_GREEN 6
+// #define CLR_BLACK 0
+// #define CLR_WHITE 1
 // -------------------------------------------
 
 
