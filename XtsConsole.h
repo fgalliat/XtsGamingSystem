@@ -96,7 +96,7 @@ class XtsConsole {
 
         while(true) {
             char ch = fgetc(f);
-            if ( ch == EOF || ch == '\n' ) {
+            if ( ch == EOF || ch == 0xFF || ch == '\n' ) {
                 break;
             }
             num[numCpt++] = ch;
