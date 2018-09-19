@@ -520,7 +520,6 @@
 
             // since 18/09/2018
             if ( color < 10 ) {
-                
                      if ( color == 0 ) { color = CLR_BLACK; }
                 else if ( color == 1 ) { color = CLR_WHITE; }
                 else if ( color == 2 ) { color = CLR_LIGHTGRAY; }
