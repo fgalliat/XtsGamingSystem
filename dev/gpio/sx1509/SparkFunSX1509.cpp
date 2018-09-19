@@ -179,7 +179,7 @@ int SX1509::read_register(int busfd, uint8_t reg, unsigned char *buf, int bufsiz
 
 char cmd[128];
 sprintf( cmd, "i2cget -y 0 0x3E 0x%02x", reg );
-printf("< %s\n", cmd);
+//printf("< %s\n", cmd);
 // system(cmd);
 //	int result = read(busfd, buf, bufsize);
 uint8_t result = (uint8_t)_sx_readCmdInteger((const char*)cmd);
@@ -187,11 +187,11 @@ uint8_t result = (uint8_t)_sx_readCmdInteger((const char*)cmd);
 // BEWARE
 buf[0] = result;
 
-printf("> %d\n", result);
+printf("> %d > %d\n", reg, result);
 
 
 
-	delay(5);
+	delay(100);
 
 //	return result;
 	return 1;
@@ -236,6 +236,25 @@ printf("- %s\n", cmd);
 }
 
 
+uint8_t SX1509::readBankA() {
+	uint8_t RegDir = i2c_readReg(REG_DIR_A);
+		
+		//if (RegDir & (1<<pin))	// If the pin is an input
+		//{
+			uint8_t RegData = i2c_readReg(REG_DATA_A);
+//			if (RegData & (1<<pin))
+//				return 1;
+		//}
+		
+		
+		
+return RegData;		
+}
+
+
+
+
+
 /*
 void SX1509::i2c_writeReg(int reg, uint8_t val) {
 
@@ -267,9 +286,10 @@ void SX1509::i2c_writeReg(int reg, uint8_t val) {
 
 uint8_t SX1509::i2c_readReg(uint8_t reg) {
 	
-	//if ( reg == REG_DIR_A ) {
-	//	return regDirASave;
-	//}
+	// dirty little Hack
+	if ( reg == REG_DIR_A && regDirASave != 0x00 ) {
+		return regDirASave;
+	}
 	
 	unsigned char buff[1];
 	read_register(wiringPiFd, reg, buff, 1);
@@ -511,7 +531,7 @@ byte SX1509::init(const char* device)
 		device = "/dev/i2c-0";
 	}
 	
-		
+/* == TEMP using cmdline i2cget ..... 
 	wiringPiFd = open(device, O_RDWR);
 
 	if (wiringPiFd < 0) {
@@ -524,6 +544,8 @@ byte SX1509::init(const char* device)
 		printf("ioctl error: %s\n", device);
 		return 1;
 	}	
+
+*/
 
 return init2(1,1);
 }

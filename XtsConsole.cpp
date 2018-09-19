@@ -59,6 +59,21 @@ bool Pad::start()  { return this->_btStart; }
 bool Pad::checkBtns()  { 
 	if ( !_gpioOK ) { return false; }
 	
+	#ifdef XTSCONSOLE
+	
+	uint8_t bankA = gpio.readBankA();
+	
+	this->_btStart = (bankA & (1 << BTN0_PIN) ) == LOW;
+	this->_bt1 = (bankA & (1 << BTN1_PIN ) ) == LOW;
+	this->_bt2 = (bankA & (1 << BTN2_PIN ) ) == LOW;
+	
+	this->_up    = (bankA & (1 << DIR_UP_PIN ))  == LOW;
+	this->_left  = (bankA & (1 << DIR_LEFT_PIN )) == LOW;
+	this->_right = (bankA & (1 << DIR_RIGHT_PIN )) == LOW;
+	this->_down  = (bankA & (1 << DIR_DOWN_PIN )) == LOW;
+	
+	#else
+	
 	this->_btStart = gpio.digitalRead( BTN0_PIN ) == LOW;
 	this->_bt1 = gpio.digitalRead( BTN1_PIN ) == LOW;
 	this->_bt2 = gpio.digitalRead( BTN2_PIN ) == LOW;
@@ -67,6 +82,8 @@ bool Pad::checkBtns()  {
 	this->_left  = gpio.digitalRead( DIR_LEFT_PIN ) == LOW;
 	this->_right = gpio.digitalRead( DIR_RIGHT_PIN ) == LOW;
 	this->_down  = gpio.digitalRead( DIR_DOWN_PIN ) == LOW;
+	
+	#endif
 	
 	return true;
 }

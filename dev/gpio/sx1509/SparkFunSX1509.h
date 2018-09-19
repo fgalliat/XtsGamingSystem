@@ -117,6 +117,8 @@ void reset2();
 
 int read_register(int busfd, uint8_t reg, unsigned char *buf, int bufsize);
 
+// read the BANK-A
+uint8_t readBankA();
 
 	void i2c_writeReg(uint8_t reg, uint8_t val);
 	uint8_t i2c_readReg(uint8_t reg);
