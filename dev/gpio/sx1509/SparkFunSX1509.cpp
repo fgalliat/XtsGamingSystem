@@ -138,8 +138,17 @@ unsigned int _sx_readCmdInteger(const char* cmd) {
         
         std::string trimmed = trim(str);
         
+        std::cout << trimmed << std::endl;
+        
         // std::string s = "0xfffefffe";
-		unsigned int result = std::stoul(trimmed, nullptr, 16);
+		unsigned int result = 0x00;
+		
+		try {
+		  result = std::stoul(trimmed, nullptr, 16);
+		} catch(std::invalid_argument &) {
+			printf("Oups reading ! \n");
+			return 0;
+		}
         
         /*
         int len = str.length();
