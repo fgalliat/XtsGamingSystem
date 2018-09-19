@@ -64,7 +64,7 @@
             while(true) {
                 char ch = fgetc(f);
                 
-                printf("I read %d\n", ch);
+                // printf("I read %d\n", ch);
                 
                 if ( ch == EOF || ch == 0xFF || ch == '\n' ) {
                     break;
