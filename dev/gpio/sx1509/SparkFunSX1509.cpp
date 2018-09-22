@@ -46,6 +46,15 @@ modified by Xtase - fgallliat @Aug2018 for Arietta G25
 
 // ===============================================================
 
+//#define MODE_CMD_LINE 1
+
+#ifndef MODE_CMD_LINE
+	#include "../../i2c/linux/i2c8Bit.h"
+	i2c8Bit i2cDevice( 0x3E, "/dev/i2c-0" );
+#endif
+
+// ===============================================================
+
 #define ALL 0xFF
 #define NONE 0x00
 
@@ -133,7 +142,7 @@ std::string _sx_exec(const char* cmd) {
     return result;
 }
 
-unsigned int _sx_readCmdInteger(const char* cmd) {
+int _sx_readCmdInteger(const char* cmd) {
         std::string str = _sx_exec( cmd );
         
         std::string trimmed = trim(str);
@@ -147,7 +156,7 @@ unsigned int _sx_readCmdInteger(const char* cmd) {
 		  result = std::stoul(trimmed, nullptr, 16);
 		} catch(std::invalid_argument &) {
 			printf("Oups reading ! \n");
-			return 0;
+			return -1;
 		}
         
         /*
@@ -158,8 +167,10 @@ unsigned int _sx_readCmdInteger(const char* cmd) {
         
         int resut = atoi(cstr, );
         */
-        return result;
+        return (int)result;
 }
+
+
 
 
 int SX1509::read_register(int busfd, uint8_t reg, unsigned char *buf, int bufsize)
@@ -177,21 +188,42 @@ int SX1509::read_register(int busfd, uint8_t reg, unsigned char *buf, int bufsiz
 	}
 */
 
-char cmd[128];
-sprintf( cmd, "i2cget -y 0 0x3E 0x%02x", reg );
-//printf("< %s\n", cmd);
-// system(cmd);
-//	int result = read(busfd, buf, bufsize);
-uint8_t result = (uint8_t)_sx_readCmdInteger((const char*)cmd);
-
-// BEWARE
-buf[0] = result;
-
-printf("> %d > %d\n", reg, result);
 
 
+#ifndef MODE_CMD_LINE
 
-	delay(100);
+	uint8_t res = 0x00;
+	i2cDevice.readReg(reg, res);
+	buf[0] = res;
+
+#else
+	char cmd[128];
+	sprintf( cmd, "i2cget -y 0 0x3E 0x%02x", reg );
+	//printf("< %s\n", cmd);
+	// system(cmd);
+	//	int result = read(busfd, buf, bufsize);
+	int result = _sx_readCmdInteger((const char*)cmd);
+	
+	if (result < 0) {
+		delay(5);
+		result = _sx_readCmdInteger((const char*)cmd);
+		if (result < 0) {
+			printf("SX WTF \n");
+			result = 255;
+		}
+	}
+	
+	// BEWARE
+	buf[0] = (uint8_t)result;
+	
+	if ( reg == REG_DATA_A ) {
+	  //printf("> %d > %d\n", reg, result);
+	  printf("DATA_A : ");
+	  writeBin( result );
+	}
+#endif
+
+	delay(15);
 
 //	return result;
 	return 1;
@@ -222,14 +254,19 @@ void SX1509::i2c_writeReg(uint8_t reg, uint8_t val) {
 	} 
 */
 
-char cmd[128];
-sprintf( cmd, "i2cset -y 0 0x3E 0x%02x 0x%02x", reg, val );
-printf("- %s\n", cmd);
- system(cmd);
-//	int result = read(busfd, buf, bufsize);
-//int result = (int)_sx_readCmdInteger((const char*)cmd);
-//printf("> %d\n", result);
+#ifndef MODE_CMD_LINE
 
+	i2cDevice.writeReg(reg, val);
+
+#else
+	char cmd[128];
+	sprintf( cmd, "i2cset -y 0 0x3E 0x%02x 0x%02x", reg, val );
+	// printf("- %s\n", cmd);
+	 system(cmd);
+	//	int result = read(busfd, buf, bufsize);
+	//int result = (int)_sx_readCmdInteger((const char*)cmd);
+	//printf("> %d\n", result);
+#endif
 
 
 	delay(15);
@@ -237,7 +274,7 @@ printf("- %s\n", cmd);
 
 
 uint8_t SX1509::readBankA() {
-	uint8_t RegDir = i2c_readReg(REG_DIR_A);
+//	uint8_t RegDir = i2c_readReg(REG_DIR_A);
 		
 		//if (RegDir & (1<<pin))	// If the pin is an input
 		//{
