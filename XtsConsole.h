@@ -44,14 +44,20 @@
 // ========================================================
 
 #define DIR_UP_PIN     0x00
-#define DIR_LEFT_PIN   0x01
-#define DIR_RIGHT_PIN  0x02
+
+//#define DIR_LEFT_PIN   0x01
+//#define DIR_RIGHT_PIN  0x02
+#define DIR_LEFT_PIN   0x02
+#define DIR_RIGHT_PIN  0x01
+
 #define DIR_DOWN_PIN   0x03
 
 
 #define BTN0_PIN  0x04
-#define BTN1_PIN  0x05
-#define BTN2_PIN  0x06
+//#define BTN1_PIN  0x05
+//#define BTN2_PIN  0x06
+#define BTN1_PIN  0x06
+#define BTN2_PIN  0x05
 
 #define LED0_PIN  0x07
 
