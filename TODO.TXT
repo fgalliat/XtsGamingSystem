@@ -1,36 +1,38 @@
-drawLine [v]
+[GFX]
+ fillTriangle (see flood method)
+ animated bcks
 
-draw [v] /fillCircle [v]
-                     
-draw [v]/fillTriangle (see flood method)
-
-drawChar/print/setCursor [v]
-
-animated bcks
-
-
-SoundCard API [v]
-
-I2C SX1509 tests (board addr : 0x3E)
-  --> https://github.com/hoppler/SparkFun-SX1509
-  --> https://www.acmesystems.it/user_i2c
-  
-  -->> https://github.com/96boards-projects/libsx1509
-  
+[I2C SX1509] (board addr : 0x3E)
  -> OUTPUT          LED  [x] (7)
- -> INPUT_PULLUP    BTN  [x] (0)
- -> INPUT           MP3  [v] (2)
-
-Lua 
- WiredScreen switching [ ]
- SoundCard lib [ ]
+ -> INPUT_PULLUP    BTN  [x] (0-6)
  
-USB
+ -> INPUT           MP3  [v] (8)
+ -> INPUT_PULLUP    BTN  [x] (9-10) {Start,Select}
+ 
+ 
+ -> FIX stable btns reading
+ 
+
+[Lua] 
+ Tetris   => @ least fillRect (no sprites)
+ Raycaster
+
+ Dr Mario => makes sprites (@least as PCT files)
+ 
+[Emuls]
+ Laines
+ xgb
+ 
+ PicoDrive
+ OsmosePI (sms/gg)
+ 
+ 
+[USB]
  The signals of the USB port A are wired to the microUSB connector so it is possible to use them only when the microUSB port is not used or not plugged on a PC. 
  The signals of the USB port B are wired to the WiFi port so it is possible to use them only when the WiFi adapter is not plugged on Arietta.
  https://www.acmesystems.it/arietta_wirings_usb
  
-How to read the Arietta on-board button
+[How to read the Arietta on-board button]
  Export the GPIO line 81 by typing:
  # echo "81" > /sys/class/gpio/export
 
