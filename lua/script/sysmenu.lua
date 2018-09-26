@@ -82,8 +82,9 @@ CHOICES = {
 
     { title="Apps",     items={ { lbl="Console >", items={ {lbl="GB",  exec="../gb/xgb"}, 
                                                            {lbl="NES", exec="../nes/xnes ../nes/roms/Dr.\\ Mario\\ \\(E\\)\\ \\[\\!\\].nes"} } },
-                                { lbl="Script >",  items={ {lbl="Demo",  script="test.lua"}, 
-                                                           {lbl="Sound", script="sound.lua"} } },
+                                { lbl="Script >",  items={ {lbl="Demo",    script="test.lua"}, 
+                                                           {lbl="Raycast", script="rcmoa.lua"}, 
+                                                           {lbl="Sound",   script="sound.lua"} } },
                                 { lbl="Native >",  items={} },
                                 { lbl="Bash",      exec="/bin/bash" } } },
 

@@ -11,6 +11,31 @@ end
 SCRIPT_PATH = "./script/"
 -- ==========================================
 
+function drawSlices(arry)
+  -- native animated BCK
+  -- lcd.fx(3, arry)
+  
+  lcd.rect( 0,   0, 320, 120, 1, 8 ); -- pink sky
+  lcd.rect( 0, 120, 320, 120, 1, 6 ); -- green floor
+  
+  local i
+  local slice
+  local attr
+  local wHeight
+  for i=1,30 do
+    slice = arry[ i + 2 ]; -- 2 fisrt bytes are scene context
+    attr = math.fmod( slice, 4 );
+    
+    -- experimental
+    wHeight = slice - attr;
+    
+    lcd.rect( (10*i)+10, math.floor( (240-wHeight)/2 ) , 10, wHeight, 1, attr );
+    
+  end
+  
+end
+
+
 
 lang="en"
 text={}
@@ -229,7 +254,10 @@ while main do
   end
   
   --print("nb of slices = "..fps)
-  lcd.fx(3, arry)
+  
+  --lcd.fx(3, arry)
+  drawSlices(arry)
+  
   -- print(max_rlen)
 
   if math.floor(playerX) == 5 or math.floor(playerX) == 6 then
