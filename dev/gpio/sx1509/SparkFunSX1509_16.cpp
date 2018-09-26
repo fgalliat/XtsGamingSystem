@@ -35,6 +35,7 @@ modified by Xtase - fgallliat @Sep2018 for Arietta G25
 //#include <wiringPi.h>
 //#include <wiringPiI2C.h>
 
+#include <string.h>
 #include <stdexcept>
 
 //#define DEBUG_SX 1
@@ -138,6 +139,9 @@ uint8_t SX1509::readBankA() {
 	
 	writeBin( result ); 
 	
+	
+	delay(100);
+	
 	return result;
 }
 
@@ -149,8 +153,13 @@ uint8_t SX1509::readBankA() {
 
 // may return -1 ...
 int _sx_readI2C(uint8_t devAddr, uint8_t regAddr, bool singleByte) {
-	char cmd[128];
+	char cmd[256];
 	sprintf( cmd, "i2cget -y %d 0x%02x 0x%02x %c", BUS_ID, devAddr, regAddr, (singleByte ? 'b' : 'w') );
+	
+	if (true) {
+		strcat( cmd, " 2>&1" );
+	}
+	
     #ifdef DEBUG_SX
 	printf( "<< %s \n", cmd );
 	#endif
@@ -197,7 +206,8 @@ byte SX1509::readByte(byte registerAddress)
 	int result = _sx_readI2C(DEV_ADDR, registerAddress, true);
 	
 	if (result < 0) {
-		delay(5);
+		printf("SX retry \n");
+		delay(15);
 		result = _sx_readI2C(DEV_ADDR, registerAddress, true);
 		if (result < 0) {
 			printf("SX WTF \n");
@@ -262,7 +272,8 @@ unsigned int SX1509::readWord(byte registerAddress)
 	int result = _sx_readI2C(DEV_ADDR, registerAddress, false);
 	
 	if (result < 0) {
-		delay(5);
+		printf("SX retry (16) \n");
+		delay(15);
 		result = _sx_readI2C(DEV_ADDR, registerAddress, false);
 		if (result < 0) {
 			printf("SX WTF (16) \n");
