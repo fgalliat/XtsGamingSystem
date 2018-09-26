@@ -129,6 +129,15 @@ int _sx_readCmdInteger(const char* cmd) {
 
 // ================================================================
 
+uint8_t SX1509::readBankA() {
+	unsigned int tempRegData = readWord(REG_DATA_B);
+	
+	uint8_t result = tempRegData % 256; // the last ones
+	return result;
+}
+
+
+
 #define DEV_ADDR 0x3E
 #define BUS_ID 0
 
@@ -144,9 +153,9 @@ int _sx_readI2C(uint8_t devAddr, uint8_t regAddr, bool singleByte) {
 int _sx_writeI2C(uint8_t devAddr, uint8_t regAddr, unsigned int value, bool singleByte) {
 	char cmd[128];
 	if ( singleByte ) {
-	  sprintf( cmd, "i2cget -y %d 0x%02x 0x%02x 0x%02x %c", BUS_ID, devAddr, regAddr, value, 'b' );
+	  sprintf( cmd, "i2cset -y %d 0x%02x 0x%02x 0x%02x %c", BUS_ID, devAddr, regAddr, value, 'b' );
 	} else {
-	  sprintf( cmd, "i2cget -y %d 0x%02x 0x%02x 0x%04x %c", BUS_ID, devAddr, regAddr, value, 'w' );
+	  sprintf( cmd, "i2cset -y %d 0x%02x 0x%02x 0x%04x %c", BUS_ID, devAddr, regAddr, value, 'w' );
 	}
 	printf( ">> %s \n", cmd );
 	//int result = _sx_readCmdInteger((const char*)cmd);
@@ -186,6 +195,8 @@ byte SX1509::readByte(byte registerAddress)
 			result = 0xFF;
 		}
 	}
+	
+	byte readValue = (byte)result;
 
 #endif
 
@@ -249,6 +260,7 @@ unsigned int SX1509::readWord(byte registerAddress)
 			result = 0xFFFF;
 		}
 	}
+	auto tmpResult = result;
 #endif
 	
 	
