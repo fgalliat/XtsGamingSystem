@@ -110,7 +110,9 @@ int _sx_readCmdInteger(const char* cmd) {
         
         std::string trimmed = trim(str);
         
+        #ifdef DEBUG_SX
         std::cout << trimmed << std::endl;
+		#endif
         
         // std::string s = "0xfffefffe";
 		unsigned int result = 0x00;
@@ -133,6 +135,9 @@ uint8_t SX1509::readBankA() {
 	unsigned int tempRegData = readWord(REG_DATA_B);
 	
 	uint8_t result = tempRegData % 256; // the last ones
+	
+	writeBin( result ); 
+	
 	return result;
 }
 
@@ -146,7 +151,9 @@ uint8_t SX1509::readBankA() {
 int _sx_readI2C(uint8_t devAddr, uint8_t regAddr, bool singleByte) {
 	char cmd[128];
 	sprintf( cmd, "i2cget -y %d 0x%02x 0x%02x %c", BUS_ID, devAddr, regAddr, (singleByte ? 'b' : 'w') );
+    #ifdef DEBUG_SX
 	printf( "<< %s \n", cmd );
+	#endif
 	int result = _sx_readCmdInteger((const char*)cmd);
 }
 
@@ -157,7 +164,9 @@ int _sx_writeI2C(uint8_t devAddr, uint8_t regAddr, unsigned int value, bool sing
 	} else {
 	  sprintf( cmd, "i2cset -y %d 0x%02x 0x%02x 0x%04x %c", BUS_ID, devAddr, regAddr, value, 'w' );
 	}
+    #ifdef DEBUG_SX
 	printf( ">> %s \n", cmd );
+	#endif
 	//int result = _sx_readCmdInteger((const char*)cmd);
 	system( cmd );
 	return 1;
