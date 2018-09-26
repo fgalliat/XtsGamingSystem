@@ -10,14 +10,15 @@
  -> INPUT_PULLUP    BTN  [x] (9-10) {Start,Select}
  
  
- -> FIX stable btns reading
+ -> FIX stable btns reading (demo -> -200ms // lua ~250ms)
  
 
 [Lua] 
- Tetris   => @ least fillRect (no sprites)
- Raycaster
+ Tetris    => @ least fillRect (no sprites)
+ Raycaster => works but have to re-code native animated background
 
- Dr Mario => makes sprites (@least as PCT files)
+ Dr Mario => makes sprites (@least as PCT files) - see later for BCK....
+ 
  
 [Emuls]
  Laines

@@ -24,7 +24,8 @@ function drawSlices(arry)
   local wHeight
   for i=1,30 do
     slice = arry[ i + 2 ]; -- 2 fisrt bytes are scene context
-    attr = math.fmod( slice, 4 );
+    -- attr = math.fmod( slice, 4 );
+    attr = slice % 4;
     
     -- experimental
     wHeight = slice - attr;

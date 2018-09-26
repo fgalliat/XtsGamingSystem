@@ -56,32 +56,39 @@ bool Pad::bt1()    { return this->_bt1; }
 bool Pad::bt2()    { return this->_bt2; }
 bool Pad::start()  { return this->_btStart; }
 
+#define PAD_TIME_CHECK 1
+
+#ifdef PAD_TIME_CHECK
+  long long xts_lastTime = 0;
+#endif
+
+
 bool Pad::checkBtns()  { 
 	if ( !_gpioOK ) { return false; }
-	
+
 	#ifdef XTSCONSOLE
 	
-	uint8_t bankA = gpio.readBankA();
-	
-	this->_btStart = (bankA & (1 << BTN0_PIN) ) == LOW;
-	this->_bt1 = (bankA & (1 << BTN1_PIN ) ) == LOW;
-	this->_bt2 = (bankA & (1 << BTN2_PIN ) ) == LOW;
-	
-	this->_up    = (bankA & (1 << DIR_UP_PIN ))  == LOW;
-	this->_left  = (bankA & (1 << DIR_LEFT_PIN )) == LOW;
-	this->_right = (bankA & (1 << DIR_RIGHT_PIN )) == LOW;
-	this->_down  = (bankA & (1 << DIR_DOWN_PIN )) == LOW;
+		uint8_t bankA = gpio.readBankA();
+		
+		this->_btStart = (bankA & (1 << BTN0_PIN) ) == LOW;
+		this->_bt1 = (bankA & (1 << BTN1_PIN ) ) == LOW;
+		this->_bt2 = (bankA & (1 << BTN2_PIN ) ) == LOW;
+		
+		this->_up    = (bankA & (1 << DIR_UP_PIN ))  == LOW;
+		this->_left  = (bankA & (1 << DIR_LEFT_PIN )) == LOW;
+		this->_right = (bankA & (1 << DIR_RIGHT_PIN )) == LOW;
+		this->_down  = (bankA & (1 << DIR_DOWN_PIN )) == LOW;
 	
 	#else
 	
-	this->_btStart = gpio.digitalRead( BTN0_PIN ) == LOW;
-	this->_bt1 = gpio.digitalRead( BTN1_PIN ) == LOW;
-	this->_bt2 = gpio.digitalRead( BTN2_PIN ) == LOW;
-	
-	this->_up    = gpio.digitalRead( DIR_UP_PIN ) == LOW;
-	this->_left  = gpio.digitalRead( DIR_LEFT_PIN ) == LOW;
-	this->_right = gpio.digitalRead( DIR_RIGHT_PIN ) == LOW;
-	this->_down  = gpio.digitalRead( DIR_DOWN_PIN ) == LOW;
+		this->_btStart = gpio.digitalRead( BTN0_PIN ) == LOW;
+		this->_bt1 = gpio.digitalRead( BTN1_PIN ) == LOW;
+		this->_bt2 = gpio.digitalRead( BTN2_PIN ) == LOW;
+		
+		this->_up    = gpio.digitalRead( DIR_UP_PIN ) == LOW;
+		this->_left  = gpio.digitalRead( DIR_LEFT_PIN ) == LOW;
+		this->_right = gpio.digitalRead( DIR_RIGHT_PIN ) == LOW;
+		this->_down  = gpio.digitalRead( DIR_DOWN_PIN ) == LOW;
 	
 	#endif
 	
@@ -94,7 +101,23 @@ bool Pad::checkBtns()  {
     WiredScreen* XtsConsole::getScreen() { return &screen; }
     //SX1509      XtsConsole::getGPIO() { return gpio; }
     
-    Pad*         XtsConsole::readPad() { pad.checkBtns(); return &pad; }
+    Pad*         XtsConsole::readPad() { 
+
+#ifdef PAD_TIME_CHECK
+	if ( xts_lastTime == 0 ) {
+		xts_lastTime = now();
+	}
+	
+	long long xts_curTime = now();
+	
+	printf("pad ms : %lld \n", ( xts_curTime - xts_lastTime ) );
+	xts_lastTime = xts_curTime;
+#endif
+
+    	pad.checkBtns(); 
+    	return &pad; 
+    	
+    }
     Pad*         XtsConsole::getPad() { return &pad; }
 
 	Power* XtsConsole::getPowerManager() { return &pwr; }
