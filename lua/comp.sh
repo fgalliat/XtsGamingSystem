@@ -29,7 +29,7 @@ do
  then
    echo "Skip."
  else
-   g++ -std=c++11 -fPIC -fpermissive $DIRECTIVES -I include -c ../$i -o build/$(basename $i).o
+   g++ -std=c++11 -fPIC -fpermissive -D$ARCH $DIRECTIVES -I include -c ../$i -o build/$(basename $i).o
  fi
 done
 
