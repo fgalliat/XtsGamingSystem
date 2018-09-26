@@ -164,6 +164,9 @@ int _sx_readI2C(uint8_t devAddr, uint8_t regAddr, bool singleByte) {
 	printf( "<< %s \n", cmd );
 	#endif
 	int result = _sx_readCmdInteger((const char*)cmd);
+	
+	delay(15);
+	return result;
 }
 
 int _sx_writeI2C(uint8_t devAddr, uint8_t regAddr, unsigned int value, bool singleByte) {
@@ -178,6 +181,9 @@ int _sx_writeI2C(uint8_t devAddr, uint8_t regAddr, unsigned int value, bool sing
 	#endif
 	//int result = _sx_readCmdInteger((const char*)cmd);
 	system( cmd );
+	
+	delay(15);
+	
 	return 1;
 }
 
