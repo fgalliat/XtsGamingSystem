@@ -134,6 +134,8 @@ int _sx_readCmdInteger(const char* cmd) {
 
 #define MODE_ACCURATE 1
 
+uint8_t acc_lastResult = 0x00;
+
 uint8_t SX1509::readBankA() {
 	unsigned int tempRegData = readWord(REG_DATA_B);
 	uint8_t result = tempRegData % 256; // the last ones
@@ -142,13 +144,18 @@ uint8_t SX1509::readBankA() {
 		// assumes that PIN 7 is an uncontrolled output
 		// assumes that PIN 0-6 are INPUT_PULLUP
 		if ( ! ( (result>>1) >= (1<<7) ) ) {
-			delay(5);
-			tempRegData = readWord(REG_DATA_B);
-			uint8_t result2 = tempRegData % 256; // the last ones
 			
-			if ( result != result2 ) {
-				// tmp : assumes that PIN7 is HIGH
-				return 0xFF;
+			if ( result != acc_lastResult ) {
+				delay(5);
+				tempRegData = readWord(REG_DATA_B);
+				uint8_t result2 = tempRegData % 256; // the last ones
+				
+				acc_lastResult = result2;
+				
+				if ( result != result2 ) {
+					// tmp : assumes that PIN7 is HIGH
+					return 0xFF;
+				}
 			}
 		}
 	#endif
