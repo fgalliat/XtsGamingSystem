@@ -154,7 +154,7 @@ uint8_t SX1509::readBankA() {
 				
 				if ( result != result2 ) {
 					// tmp : assumes that PIN7 is HIGH
-					return 0xFF;
+					result = 0xFF;
 				}
 			}
 		}
