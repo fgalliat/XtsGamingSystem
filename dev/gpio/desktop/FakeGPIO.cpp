@@ -53,13 +53,13 @@ byte SX1509::digitalRead(byte pin) {
     __keys = pollKey();
 
          if ( pin == 0 && __keys == SDLK_UP ) { return LOW; }
-    else if ( pin == 1 && __keys == SDLK_LEFT ) { return LOW; }
-    else if ( pin == 2 && __keys == SDLK_RIGHT ) { return LOW; }
+    else if ( pin == 2 && __keys == SDLK_LEFT ) { return LOW; }
+    else if ( pin == 1 && __keys == SDLK_RIGHT ) { return LOW; }
     else if ( pin == 3 && __keys == SDLK_DOWN ) { return LOW; }
 
     else if ( pin == 4 && __keys == SDLK_s ) { return LOW; }
-    else if ( pin == 5 && __keys == SDLK_d ) { return LOW; }
-    else if ( pin == 6 && __keys == SDLK_f ) { return LOW; }
+    else if ( pin == 6 && __keys == SDLK_d ) { return LOW; }
+    else if ( pin == 5 && __keys == SDLK_f ) { return LOW; }
 
     __keysCpt++;
 
