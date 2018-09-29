@@ -26,6 +26,11 @@
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 
+#ifndef SDL_WINDOW_ALWAYS_ON_TOP
+  // for old versions of SDL2
+  #define SDL_WINDOW_ALWAYS_ON_TOP 0x00008000
+#endif
+
 /*
  ~ DESKTOP impl. (SDL2 for ariettaG25 Xts-subSystem)
  
