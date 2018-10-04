@@ -23,6 +23,12 @@
 
 #include "../wiredSPI/WiredScreen.h"
 
+#ifndef ZOOM
+  // #define ZOOM 1
+  #define ZOOM 2
+#endif
+
+
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 
@@ -143,7 +149,7 @@ void *_xts_keyThread(void *argument){
     }
 
     bool WiredScreen::init() {
-        window = SDL_CreateWindow("ILI9341", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_BORDERLESS);
+        window = SDL_CreateWindow("ILI9341", 0, 0, SCREEN_WIDTH * ZOOM, SCREEN_HEIGHT * ZOOM, SDL_WINDOW_SHOWN | SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_BORDERLESS);
         if (window == NULL)
         {
             std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
@@ -157,7 +163,7 @@ void *_xts_keyThread(void *argument){
             exit(1);
         }
 
-        surface = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT,
+        surface = SDL_CreateRGBSurface(0, SCREEN_WIDTH * ZOOM, SCREEN_HEIGHT * ZOOM,
                                        32,
                                        0,
                                        0,
