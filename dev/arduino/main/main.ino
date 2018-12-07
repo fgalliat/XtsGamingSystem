@@ -118,12 +118,12 @@ SX1509 io;                        // Create an SX1509 object to be used througho
 
 #include <SoftwareSerial.h>
 
-// Not all pins on the Leonardo and Micro support change interrupts, 
-// so only the following can be used for RX: 8, 9, 10, 11, 14 (MISO), 
+// Not all pins on the Leonardo and Micro support change interrupts,
+// so only the following can be used for RX: 8, 9, 10, 11, 14 (MISO),
 // 15 (SCK), 16 (MOSI).
 
 // (rx,tx) -- 9 is lowest/left pin
-SoftwareSerial SerialX(8,9);
+SoftwareSerial SerialX(8, 9);
 
 #include "SoundCard.h"
 SoundCard sound(&SerialX);
@@ -227,6 +227,23 @@ void setup()
 #endif
 }
 
+// ===============================================
+
+bool checkCMD(char *str, const char *cmd)
+{
+    return strncmp(str, cmd, 3) == 0;
+}
+
+int readNumberFromSerial()
+{
+    char str[3 + 1];
+    memset(str, 0x00, 3 + 1);
+    int readed = Serial.readBytes(str, 3);
+    return readed <= 0 ? -1 : atoi(str);
+}
+
+// ===============================================
+
 void loop()
 {
 
@@ -297,23 +314,54 @@ void loop()
 #ifndef HAS_MP3
                     Serial.println("# MP3 commands not yet supported");
 #else
-                    if (strncmp(cmd, "MPL", 3) == 0)
+// 0x30
+#define MAX_VOL 48
+                    if (checkCMD(cmd, "MPL"))
                     {
-                        char trackStr[3 + 1];
-                        memset(trackStr, 0x00, 4);
-                        int subReaded = Serial.readBytes(trackStr, 3);
-                        int trackNum = atoi(trackStr);
+                        int trackNum = readNumberFromSerial();
                         sound.play(trackNum);
-                        Serial.print("# MP3 play ");
-                        Serial.println(trackNum);
+                        // Serial.print("# MP3 playing ");
+                        // Serial.println(trackNum);
                     }
-                    else if (strncmp(cmd, "MSP", 3) == 0)
+                    else if (checkCMD(cmd, "MSP"))
                     {
                         sound.stop();
                     }
-                    else if (strncmp(cmd, "MPA", 3) == 0)
+                    else if (checkCMD(cmd, "MPA"))
                     {
                         sound.pause();
+                    }
+                    else if (checkCMD(cmd, "MNX"))
+                    {
+                        sound.next();
+                    }
+                    else if (checkCMD(cmd, "MPV"))
+                    {
+                        sound.prev();
+                    }
+                    else if (checkCMD(cmd, "MVL"))
+                    {
+                        int volPercent = readNumberFromSerial();
+                        if (volPercent < 0)
+                            volPercent = 0;
+                        if (volPercent > 100)
+                            volPercent = 100;
+                        sound.volume(volPercent * MAX_VOL / 100);
+                    }
+                    else if (checkCMD(cmd, "MVG"))
+                    {
+                        int volPercent = sound.getVolume();
+                        volPercent = volPercent * 100 / MAX_VOL;
+                        char str[10];
+                        sprintf(str, "# %d", volPercent);
+                        Serial.println(str);
+                    }
+                    else if (checkCMD(cmd, "MPG"))
+                    {
+                        int num = sound.getTrackNum();
+                        char str[10];
+                        sprintf(str, "# %d", num);
+                        Serial.println(str);
                     }
 #endif
                 }
