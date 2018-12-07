@@ -149,6 +149,7 @@ bool OK_DFPLAY = false;
 #define MODE_SMARTKEY_PROXY 1
 #define MODE_SERIAL_PROXY 2
 int serialMode = MODE_NO_PROXY;
+bool gpioOnInterrupt = false;
 // -==================-
 
 // builtin led
@@ -268,6 +269,12 @@ void loop()
             states[i] = curOne;
         }
 
+        if (!gpioOnInterrupt)
+        {
+            // always send before any cmd parsed
+            atLeastOne = true;
+        }
+
         if (atLeastOne)
         {
             for (int i = 0; i < 16; i++)
@@ -305,6 +312,16 @@ void loop()
                             {
                                 io.digitalWrite(pin, pinVal ? HIGH : LOW);
                             }
+                        }
+                    }
+                    else if (cmd[1] == 'R')
+                    {
+                        if (cmd[2] == 'M')
+                        {
+                            // SRM0
+                            // sets the GPIO reading mode
+                            int val = Serial.read() == '0' ? 0 : 1;
+                            gpioOnInterrupt = val == 1;
                         }
                     }
                 }
