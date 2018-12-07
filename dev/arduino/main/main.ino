@@ -5,7 +5,7 @@
  * Because of wiring SX on AriettaG25 causes too much kernel errors
  * 
  * needs :
- * switch ON/OFF led {7}
+ * switch ON/OFF GameGear led {7}
  * read GameGear pad buttons (up,left,right,down, 1,2,Start) {0..6}
  * read DFPlayer "playing" line {8}
  * read new add. buttons [Start bis] & [Select] {9,10}
@@ -20,6 +20,10 @@
  * RST    - reset module & devices (only soft for now...)
  * SW70   - Switch Off GPIO-LED
  * SW71   - Switch On GPIO-LED
+ * 
+ * MPL22  - PlayMp3 #22
+ * MSP    - StopMp3
+ * MPA    - PauseMp3
  * 
  * based on :
 SparkFun SX1509 I/O Expander Example: digital in (digitalRead)
@@ -107,6 +111,37 @@ const byte SX1509_ADDRESS = 0x3E; // SX1509 I2C address
 SX1509 io;                        // Create an SX1509 object to be used throughout
 
 // -==================-
+
+#define HAS_MP3 1
+
+#ifdef HAS_MP3
+
+#include <SoftwareSerial.h>
+
+// Not all pins on the Leonardo and Micro support change interrupts, 
+// so only the following can be used for RX: 8, 9, 10, 11, 14 (MISO), 
+// 15 (SCK), 16 (MOSI).
+
+// (rx,tx) -- 9 is lowest/left pin
+SoftwareSerial SerialX(8,9);
+
+#include "SoundCard.h"
+SoundCard sound(&SerialX);
+
+bool initSound()
+{
+    SerialX.begin(9600);
+    return sound.init();
+}
+
+void resetSound()
+{
+    sound.close();
+}
+
+#endif
+
+// -==================-
 bool OK_SX1509 = false;
 bool OK_DFPLAY = false;
 // -==================-
@@ -139,7 +174,10 @@ void (*resetAVR)(void) = 0; //declare reset function @ address 0
 
 void resetAll()
 {
-    // stop MP3 playback
+// stop MP3 playback
+#ifdef HAS_MP3
+    resetSound();
+#endif
     resetAVR();
 }
 // -==================-
@@ -183,6 +221,10 @@ void setup()
             }
         }
     } // end of SX OK
+
+#ifdef HAS_MP3
+    OK_DFPLAY = initSound();
+#endif
 }
 
 void loop()
@@ -251,8 +293,29 @@ void loop()
                 }
                 else if (cmd[0] == 'M')
                 {
-                    // DFPlayer cmd
+// DFPlayer cmd
+#ifndef HAS_MP3
                     Serial.println("# MP3 commands not yet supported");
+#else
+                    if (strncmp(cmd, "MPL", 3) == 0)
+                    {
+                        char trackStr[3 + 1];
+                        memset(trackStr, 0x00, 4);
+                        int subReaded = Serial.readBytes(trackStr, 3);
+                        int trackNum = atoi(trackStr);
+                        sound.play(trackNum);
+                        Serial.print("# MP3 play ");
+                        Serial.println(trackNum);
+                    }
+                    else if (strncmp(cmd, "MSP", 3) == 0)
+                    {
+                        sound.stop();
+                    }
+                    else if (strncmp(cmd, "MPA", 3) == 0)
+                    {
+                        sound.pause();
+                    }
+#endif
                 }
                 else if (cmd[0] == 'D')
                 {
