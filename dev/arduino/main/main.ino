@@ -113,11 +113,24 @@ SX1509 io;                        // Create an SX1509 object to be used througho
 // -==================-
 
 #define HAS_MP3 1
-
-#ifdef HAS_MP3
+#define HAS_OTHER_SERIAL 1
 
 #include <SoftwareSerial.h>
 
+#ifdef HAS_OTHER_SERIAL
+// (rx,tx) -- 10 is lowest/right pin
+SoftwareSerial SerialO(10, 11);
+
+void initOtherSerial()
+{
+    // TODO DSB cmd to set Bauds
+    SerialO.begin(9600);
+    SerialO.listen();
+}
+
+#endif
+
+#ifdef HAS_MP3
 // Not all pins on the Leonardo and Micro support change interrupts,
 // so only the following can be used for RX: 8, 9, 10, 11, 14 (MISO),
 // 15 (SCK), 16 (MOSI).
@@ -225,6 +238,10 @@ void setup()
 
 #ifdef HAS_MP3
     OK_DFPLAY = initSound();
+#endif
+
+#ifdef HAS_OTHER_SERIAL
+    initOtherSerial();
 #endif
 }
 
@@ -384,8 +401,23 @@ void loop()
                 }
                 else if (cmd[0] == 'D')
                 {
+#ifndef HAS_OTHER_SERIAL
                     // other Serial dummy cmd (SmartKey or full proxy)
                     Serial.println("# DUMMY commands not yet supported");
+#else
+                    if (cmd[1] == 'S')
+                    {
+                        // TODO DSB to set bauds
+                        if (cmd[2] == 'K')
+                        {
+                            char str[128 + 1];
+                            memset(str, 0x00, 128 + 1);
+                            int subreaded = Serial.readBytes(str, 128);
+
+                            SerialO.write(str, subreaded);
+                        }
+                    }
+#endif
                 }
                 else if (cmd[0] == 'R')
                 {
