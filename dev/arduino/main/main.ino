@@ -13,7 +13,6 @@
  * 
  * TODOs :
  * 2x new buttons reading
- * may be DFPlayer driving .... (I/O cmds + GPIO line)
  * 
  * CMD set :
  * INF    - Infos
@@ -21,9 +20,19 @@
  * SW70   - Switch Off GPIO-LED
  * SW71   - Switch On GPIO-LED
  * 
+ * SRM0   - GPIO Read Continuously
+ * SRM1   - GPIO Read OnInterrupt
+ * SRC    - GPIO Read Continue (or begin)
+ * SRS    - GPIO Read Stop
+ * 
  * MPL22  - PlayMp3 #22
  * MSP    - StopMp3
  * MPA    - PauseMp3
+ * MNX    - NextMp3 
+ * (....)
+ * 
+ * DSB    - Set Bauds of other Serial Port
+ * DSK    - Dummy Send on other Serial Port
  * 
  * based on :
 SparkFun SX1509 I/O Expander Example: digital in (digitalRead)
@@ -162,7 +171,9 @@ bool OK_DFPLAY = false;
 #define MODE_SMARTKEY_PROXY 1
 #define MODE_SERIAL_PROXY 2
 int serialMode = MODE_NO_PROXY;
+
 bool gpioOnInterrupt = false;
+bool gpioCanceled = true; // have to call 'SRC' to display it again
 // -==================-
 
 // builtin led
@@ -252,11 +263,11 @@ bool checkCMD(char *str, const char *cmd)
     return strncmp(str, cmd, 3) == 0;
 }
 
-int readNumberFromSerial()
+int readNumberFromSerial(const int length = 3)
 {
-    char str[3 + 1];
-    memset(str, 0x00, 3 + 1);
-    int readed = Serial.readBytes(str, 3);
+    char str[length + 1];
+    memset(str, 0x00, length + 1);
+    int readed = Serial.readBytes(str, length);
     return readed <= 0 ? -1 : atoi(str);
 }
 
@@ -292,7 +303,7 @@ void loop()
             atLeastOne = true;
         }
 
-        if (atLeastOne)
+        if (!gpioCanceled && atLeastOne)
         {
             for (int i = 0; i < 16; i++)
             {
@@ -339,6 +350,16 @@ void loop()
                             // sets the GPIO reading mode
                             int val = Serial.read() == '0' ? 0 : 1;
                             gpioOnInterrupt = val == 1;
+                        }
+                        else if (cmd[2] == 'C')
+                        {
+                            // Gpio Continue
+                            gpioCanceled = false;
+                        }
+                        else if (cmd[2] == 'S')
+                        {
+                            // Gpio Stop
+                            gpioCanceled = true;
                         }
                     }
                 }
@@ -407,9 +428,19 @@ void loop()
 #else
                     if (cmd[1] == 'S')
                     {
-                        // TODO DSB to set bauds
-                        if (cmd[2] == 'K')
+                        if (cmd[2] == 'B')
                         {
+                            // Dummy Send @Bauds
+                            int bauds = readNumberFromSerial(8); // even if can't reach 115200 @8MHz ....
+                            if (bauds > 0)
+                            {
+                                SerialO.begin(bauds);
+                                SerialO.listen();
+                            }
+                        }
+                        else if (cmd[2] == 'K')
+                        {
+                            // Dummy Send to Key
                             char str[128 + 1];
                             memset(str, 0x00, 128 + 1);
                             int subreaded = Serial.readBytes(str, 128);
