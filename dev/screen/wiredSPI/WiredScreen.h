@@ -1,6 +1,8 @@
 #ifndef __BRIDGED_SCREEN_H_
 #define __BRIDGED_SCREEN_H_ 1
 
+#include <stdint.h>
+
 #define rgb16(r,g,b) { (uint16_t)( (( r *31/255 )<<11) | (( g *63/255 )<<5) | ( b *31/255 ) ) }
 
 #define CLR_PINK  rgb16(255,0,150)

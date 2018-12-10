@@ -9,6 +9,10 @@
  **/
 
 #include <sys/stat.h> // for mkdir
+#include <stdio.h>
+#include <cstdlib>
+
+extern void delay(int time);
 
   class Power {
      private:
@@ -135,7 +139,7 @@
 
        // battery discharging time in min. (5min accurate)
        int getTime() {
-           if ( time < 0 ) {
+           if ( _time < 0 ) {
                readBattTimerFile();
            }
            return _time * ACCURACY;

@@ -32,7 +32,8 @@ static WiredScreen screen;
 static Serial Serial1("/dev/ttyS2", 9600);
 static SoundCard snd( &Serial1 );
 
-static auto gpio = SX1509();
+// static auto gpio = SX1509();
+static auto gpio = GpioOverArduino( &Serial1 );
 
 
 static Pad pad = Pad();
@@ -66,30 +67,44 @@ bool Pad::start()  { return this->_btStart; }
 bool Pad::checkBtns()  { 
 	if ( !_gpioOK ) { return false; }
 
-	#ifdef XTSCONSOLE
-	
-		uint8_t bankA = gpio.readBankA();
+	#ifdef NEW_SERIAL_GPIO
+		char* banks = gpio.readAllPins();
+
+		this->_btStart = gpio.isAButtonPressed(banks, BTN0_PIN);
+		this->_bt1 = gpio.isAButtonPressed(banks, BTN1_PIN);
+		this->_bt2 = gpio.isAButtonPressed(banks, BTN2_PIN);
 		
-		this->_btStart = (bankA & (1 << BTN0_PIN) ) == LOW;
-		this->_bt1 = (bankA & (1 << BTN1_PIN ) ) == LOW;
-		this->_bt2 = (bankA & (1 << BTN2_PIN ) ) == LOW;
-		
-		this->_up    = (bankA & (1 << DIR_UP_PIN ))  == LOW;
-		this->_left  = (bankA & (1 << DIR_LEFT_PIN )) == LOW;
-		this->_right = (bankA & (1 << DIR_RIGHT_PIN )) == LOW;
-		this->_down  = (bankA & (1 << DIR_DOWN_PIN )) == LOW;
-	
+		this->_up    = gpio.isAButtonPressed(banks, DIR_UP_PIN);
+		this->_left  = gpio.isAButtonPressed(banks, DIR_LEFT_PIN);
+		this->_right = gpio.isAButtonPressed(banks, DIR_RIGHT_PIN);
+		this->_down  = gpio.isAButtonPressed(banks, DIR_DOWN_PIN);
+
 	#else
-	
-		this->_btStart = gpio.digitalRead( BTN0_PIN ) == LOW;
-		this->_bt1 = gpio.digitalRead( BTN1_PIN ) == LOW;
-		this->_bt2 = gpio.digitalRead( BTN2_PIN ) == LOW;
+		#ifdef XTSCONSOLE
 		
-		this->_up    = gpio.digitalRead( DIR_UP_PIN ) == LOW;
-		this->_left  = gpio.digitalRead( DIR_LEFT_PIN ) == LOW;
-		this->_right = gpio.digitalRead( DIR_RIGHT_PIN ) == LOW;
-		this->_down  = gpio.digitalRead( DIR_DOWN_PIN ) == LOW;
-	
+			uint8_t bankA = gpio.readBankA();
+			
+			this->_btStart = (bankA & (1 << BTN0_PIN) ) == LOW;
+			this->_bt1 = (bankA & (1 << BTN1_PIN ) ) == LOW;
+			this->_bt2 = (bankA & (1 << BTN2_PIN ) ) == LOW;
+			
+			this->_up    = (bankA & (1 << DIR_UP_PIN ))  == LOW;
+			this->_left  = (bankA & (1 << DIR_LEFT_PIN )) == LOW;
+			this->_right = (bankA & (1 << DIR_RIGHT_PIN )) == LOW;
+			this->_down  = (bankA & (1 << DIR_DOWN_PIN )) == LOW;
+		
+		#else
+		
+			this->_btStart = gpio.digitalRead( BTN0_PIN ) == LOW;
+			this->_bt1 = gpio.digitalRead( BTN1_PIN ) == LOW;
+			this->_bt2 = gpio.digitalRead( BTN2_PIN ) == LOW;
+			
+			this->_up    = gpio.digitalRead( DIR_UP_PIN ) == LOW;
+			this->_left  = gpio.digitalRead( DIR_LEFT_PIN ) == LOW;
+			this->_right = gpio.digitalRead( DIR_RIGHT_PIN ) == LOW;
+			this->_down  = gpio.digitalRead( DIR_DOWN_PIN ) == LOW;
+		
+		#endif
 	#endif
 	
 	return true;
@@ -130,8 +145,12 @@ bool Pad::checkBtns()  {
 			// need to re-init screen each time (arietta cf malloc / desktop cf WindowSDLPtr)
 			screen.init();
 
-			// what to do for GPIO (on arrieta via I2C !!!!!) ????
+#ifndef NEW_SERIAL_GPIO
+			// // what to do for GPIO (on arrieta via I2C !!!!!) ????
 			this->gpioOK = gpio.begin(0x3E) != 0;
+#else			
+			this->gpioOK = gpio.init();
+#endif
     		_gpioOK = this->gpioOK;
 
 			_consoleINITED = true;
@@ -145,10 +164,15 @@ bool Pad::checkBtns()  {
     	snd.init();
     	snd.volume(20); // max 30
     	
+#ifndef NEW_SERIAL_GPIO
     	this->gpioOK = gpio.begin(0x3E) != 0;
+#else
+		this->gpioOK = gpio.init();
+#endif
     	_gpioOK = this->gpioOK;
     	
     	if ( this->gpioOK ) {
+#ifndef NEW_SERIAL_GPIO
     		gpio.pinMode( DIR_UP_PIN,    INPUT_PULLUP );
 			gpio.pinMode( DIR_LEFT_PIN,  INPUT_PULLUP );
 			gpio.pinMode( DIR_RIGHT_PIN, INPUT_PULLUP );
@@ -162,6 +186,9 @@ bool Pad::checkBtns()  {
 			
 			gpio.pinMode( LED0_PIN, OUTPUT ); gpio.pinMode( LED1_PIN, OUTPUT );
 			gpio.digitalWrite(LED0_PIN, LOW); gpio.digitalWrite(LED1_PIN, LOW);
+#else
+			gpio.setOutputState(LED0_PIN, false);
+#endif
     	}
     	
     	this->led(true);
@@ -186,7 +213,11 @@ bool Pad::checkBtns()  {
 
     void XtsConsole::led(bool state) {
     	if ( this->gpioOK ) {
+#ifndef NEW_SERIAL_GPIO
     		gpio.digitalWrite(LED0_PIN, state ? HIGH : LOW);
+#else
+			gpio.setOutputState(LED0_PIN, state);
+#endif
     	}
     }
 
@@ -214,7 +245,9 @@ bool Pad::checkBtns()  {
 		return milliseconds;
 	}
 
-	
+	void XtsConsole::delay(int time) {
+		::delay(time);
+	}
     
     // ===========================
 

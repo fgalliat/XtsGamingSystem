@@ -11,6 +11,8 @@
  * 
  **/
 
+#include <string.h>
+
 // main architecture settings file
 #include "dev/arch.h"
 
@@ -123,6 +125,7 @@ class XtsConsole {
     bool isLocked() { return readConsoleLockFile() > CONSOLE_STATUS_NOT_STARTED; }
 
     long long now();
+    void delay(int time);
 
     bool isInited();
 

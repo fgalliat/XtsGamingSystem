@@ -18,7 +18,6 @@
 #include <string.h>
 
 #include "ArduinoGPIO.h"
-#include "../../serial/Serial.h"
 
 extern void delay(int time);
 
@@ -27,9 +26,16 @@ GpioOverArduino::~GpioOverArduino() {}
 
 bool GpioOverArduino::init()
 {
-    this->serial->writestr("SRM0"); // mode 0 (coutinuous stream)
-    this->serial->writestr("SRC");  // SX Read Continue
-    return true;
+
+    // this->serial->writestr("SRM2"); // mode 2 (on demand)
+    char garbageFlushRX[64 + 1];
+    int readed = this->serial->read(garbageFlushRX, 64);
+
+    return this->readAllPins() != NULL;
+
+    // this->serial->writestr("SRM0"); // mode 0 (coutinuous stream)
+    // this->serial->writestr("SRC");  // SX Read Continue
+    // return true;
 }
 
 void GpioOverArduino::close()
@@ -44,9 +50,12 @@ void GpioOverArduino::stop()
 
 char *GpioOverArduino::readAllPins()
 {
+    this->serial->writestr("SRM2"); // mode 2 (on demand)
+
     // this->serial->read(....)  16+1 bytes to read (last is \n)
     char buffer[16 + 1 + 1]; // +1 '\n' +1 '\0'
-    int readed = this->serial->read(buffer, 16 + 1) if (readed != 16 + 1)
+    int readed = this->serial->read(buffer, 16 + 1);
+    if (readed != 16 + 1)
     {
         return NULL;
     }
