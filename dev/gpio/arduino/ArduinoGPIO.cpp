@@ -28,8 +28,9 @@ bool GpioOverArduino::init()
 {
 
     // this->serial->writestr("SRM2"); // mode 2 (on demand)
-    char garbageFlushRX[64 + 1];
-    int readed = this->serial->read(garbageFlushRX, 64);
+    this->serial->writestr("RST"); // RESET
+    char garbageFlushRX[128 + 1];
+    int readed = this->serial->read(garbageFlushRX, 128);
 
     return this->readAllPins() != NULL;
 
