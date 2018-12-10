@@ -123,11 +123,16 @@ SX1509 io;                        // Create an SX1509 object to be used througho
 
 void sendGPIOStates()
 {
+
+    static char seq[16+1+1];
+    seq[16+0] = '\n';
+    seq[16+1] = 0x00;
+
     for (int i = 0; i < 16; i++)
     {
-        Serial.print(states[i] ? '1' : '0');
+        seq[i] = (states[i] ? '1' : '0');
     }
-    Serial.println();
+    Serial.print(seq);
 }
 
 // -==================-

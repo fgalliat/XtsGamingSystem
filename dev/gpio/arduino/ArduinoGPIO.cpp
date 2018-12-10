@@ -28,23 +28,23 @@ bool GpioOverArduino::init()
 {
 
     // this->serial->writestr("SRM2"); // mode 2 (on demand)
-    
+
     //this->serial->writestr("RST"); // RESET
     // delay(300);
-    
+
     char garbageFlushRX[128 + 1];
     int readed = this->serial->read(garbageFlushRX, 128);
-    
+
     // 12 bytes
     // if (readed > 0) {
-    	this->ok = true;
+    this->ok = true;
     // }
-    
+
     printf("-- %d bytes read\n", readed);
-    if (readed > 0) {
-    	printf("-- %s bytes read\n", garbageFlushRX);
+    if (readed > 0)
+    {
+        printf("-- %s bytes read\n", garbageFlushRX);
     }
-    
 
     return this->readAllPins() != NULL;
 
@@ -55,7 +55,7 @@ bool GpioOverArduino::init()
 
 void GpioOverArduino::close()
 {
-	this->ok = false;
+    this->ok = false;
     this->stop();
     this->serial->writestr("RST"); // RESET
     delay(300);
@@ -68,36 +68,34 @@ void GpioOverArduino::stop()
 
 char *GpioOverArduino::readAllPins()
 {
-	if ( !this->ok ) {
-		return NULL;
-	}
-	
-    static char buffer[16 + 1]; //  +1 '\0'
-    static char term[1] = {0x00};
-    static char CRLF[2] = {0x00, 0x00};
-    memset(buffer, 0x00, 16+2+1);
-	
-    this->serial->writestr("SRM"); // mode 2 (on demand)
-    this->serial->writestr("2"); // mode 2 (on demand)
-    // this->serial->write(term,1);
-
-    
-    // TODO : lock Serial.write ....
-    
-    delay(90); // less time makes Serial Reading hanging
-    int readed = this->serial->read(buffer, 16);
-    
-    // printf("f:%d bytes read\n", readed);
-    // printf("s:%s bytes read\n", buffer);
-    
-    if (readed != 16)
+    if (!this->ok)
     {
-    	printf("Oups %d \n", readed);
         return NULL;
     }
-    
-    int readed2 = this->serial->read(CRLF, 2);
-    
+
+    static char buffer[16 + 1 + 1]; //  +1 '\n' +1 '\0'
+    // static char term[1] = {0x00};
+    // static char CRLF[2] = {0x00, 0x00};
+    memset(buffer, 0x00, 16 + 1 + 1);
+
+    this->serial->writestr("SRM"); // mode 2 (on demand)
+    this->serial->writestr("2");   // mode 2 (on demand)
+    // this->serial->write(term,1);
+
+    // TODO : lock Serial.write ....
+
+    delay(30); // less time makes Serial Reading hanging
+    int readed = this->serial->read(buffer, 16 + 1);
+
+    // printf("f:%d bytes read\n", readed);
+    // printf("s:%s bytes read\n", buffer);
+
+    if (readed != 16 + 1)
+    {
+        printf("Oups %d \n", readed);
+        return NULL;
+    }
+
     return buffer;
 }
 
@@ -119,7 +117,10 @@ void GpioOverArduino::setOutputState(int pin, bool state)
 
 bool GpioOverArduino::isAButtonPressed(char *states, int pin)
 {
-	if ( states == NULL ) { return false; }
+    if (states == NULL)
+    {
+        return false;
+    }
     static const int BTN0_PIN = 8; // INPUT_PULLUP
     if (pin < 0 || pin >= 16)
     {
@@ -130,7 +131,10 @@ bool GpioOverArduino::isAButtonPressed(char *states, int pin)
 
 bool GpioOverArduino::isMP3Playing(char *states)
 {
-	if ( states == NULL ) { return false; }
+    if (states == NULL)
+    {
+        return false;
+    }
     static const int MP3_PIN = 8; // INPUT
     return states[MP3_PIN] == '0';
 }
