@@ -71,8 +71,8 @@ int set_interface_attribs (int fd, int speed, int parity)
         
         tty.c_cc[VMIN]  = 0;            // read doesn't block
         
-        tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
-        // tty.c_cc[VTIME] = 10;            // 1 seconds read timeout
+        // tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+        tty.c_cc[VTIME] = 2;            // 0.2 seconds read timeout
 
         tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
 

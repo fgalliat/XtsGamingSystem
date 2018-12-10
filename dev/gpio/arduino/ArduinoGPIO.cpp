@@ -46,7 +46,8 @@ bool GpioOverArduino::init()
         printf("-- %s bytes read\n", garbageFlushRX);
     }
 
-    return this->readAllPins() != NULL;
+    // return this->readAllPins() != NULL;
+    return true;
 
     // this->serial->writestr("SRM0"); // mode 0 (coutinuous stream)
     // this->serial->writestr("SRC");  // SX Read Continue
@@ -75,26 +76,30 @@ char *GpioOverArduino::readAllPins()
 
     static char buffer[16 + 1 + 1]; //  +1 '\n' +1 '\0'
     // static char term[1] = {0x00};
-    // static char CRLF[2] = {0x00, 0x00};
-    memset(buffer, 0x00, 16 + 1 + 1);
+    static char CRLF[2] = {0x00, 0x00};
+    memset(buffer, 0x00, 16 + 0 + 1);
 
+    // this->serial->writestr("SRM2"); // mode 2 (on demand)
     this->serial->writestr("SRM"); // mode 2 (on demand)
+    delay(2);
     this->serial->writestr("2");   // mode 2 (on demand)
-    // this->serial->write(term,1);
 
     // TODO : lock Serial.write ....
 
-    delay(30); // less time makes Serial Reading hanging
-    int readed = this->serial->read(buffer, 16 + 1);
+    delay(80); // less time makes Serial Reading hanging
+    int readed = this->serial->read(buffer, 16);
 
     // printf("f:%d bytes read\n", readed);
     // printf("s:%s bytes read\n", buffer);
 
-    if (readed != 16 + 1)
+    if (readed != 16)
     {
         printf("Oups %d \n", readed);
         return NULL;
     }
+    this->serial->read(buffer, 1); // '\n'
+
+	delay(10);
 
     return buffer;
 }
