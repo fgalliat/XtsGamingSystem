@@ -167,12 +167,11 @@ bool Pad::checkBtns()  {
 #ifndef NEW_SERIAL_GPIO
     	this->gpioOK = gpio.begin(0x3E) != 0;
 #else
-		this->gpioOK = gpio.init(); // resets MCU
+		this->gpioOK = gpio.init();
 #endif
     	_gpioOK = this->gpioOK;
 
     	snd.init();
-    	// snd.volume(20); // max 30
     	snd.volume(45); // max 100
     	
     	if ( this->gpioOK ) {

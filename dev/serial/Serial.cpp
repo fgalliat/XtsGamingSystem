@@ -19,7 +19,11 @@ bool _uart_failed = false;
 
 Serial::Serial(const char *_portname, int speed) {
   portname = (char*)_portname;
-  if(! (uart_open(portname, speed == 115200 ? B115200 : B9600, 0) > 0) ) {
+  
+  int blocking = 0;
+  //blocking = 1;
+  
+  if(! (uart_open(portname, speed == 115200 ? B115200 : B9600, blocking) > 0) ) {
 	_uart_failed = true;
         printf("FAILED TO OPEN 'Serial' !!! \n");
   }
@@ -64,8 +68,11 @@ int set_interface_attribs (int fd, int speed, int parity)
         tty.c_lflag = 0;                // no signaling chars, no echo,
                                         // no canonical processing
         tty.c_oflag = 0;                // no remapping, no delays
+        
         tty.c_cc[VMIN]  = 0;            // read doesn't block
+        
         tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+        // tty.c_cc[VTIME] = 10;            // 1 seconds read timeout
 
         tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
 

@@ -200,6 +200,7 @@ bool SoundCard::init()
 	// execute_CMD(this->serial, 0x3F, 0, 0); // init
 	// delay(500);
 
+	this->stop();
 	this->volume(_snd_vol);
 }
 void SoundCard::close()

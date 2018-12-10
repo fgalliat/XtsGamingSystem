@@ -7,6 +7,7 @@ class GpioOverArduino
 {
 private:
   Serial *serial = NULL;
+  bool ok = false;
 
 public:
   GpioOverArduino(Serial *serial);
