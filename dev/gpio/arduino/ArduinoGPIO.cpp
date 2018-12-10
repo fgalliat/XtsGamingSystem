@@ -93,7 +93,7 @@ bool GpioOverArduino::isAButtonPressed(char *states, int pin)
 bool GpioOverArduino::isMP3Playing(char *states)
 {
     static const int MP3_PIN = 8; // INPUT
-    return states[MP3_PIN] == '1';
+    return states[MP3_PIN] == '0';
 }
 
 void GpioOverArduino::led(bool state)
