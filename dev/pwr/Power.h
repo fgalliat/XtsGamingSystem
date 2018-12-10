@@ -11,6 +11,7 @@
 #include <sys/stat.h> // for mkdir
 #include <stdio.h>
 #include <cstdlib>
+#include <pthread.h>
 
 extern void delay(int time);
 
