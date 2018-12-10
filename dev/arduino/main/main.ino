@@ -124,9 +124,9 @@ SX1509 io;                        // Create an SX1509 object to be used througho
 void sendGPIOStates()
 {
 
-    static char seq[16+1+1];
-    seq[16+0] = '\n';
-    seq[16+1] = 0x00;
+    static char seq[16 + 1 + 1];
+    seq[16 + 0] = '\n';
+    seq[16 + 1] = 0x00;
 
     for (int i = 0; i < 16; i++)
     {
@@ -289,6 +289,36 @@ int readNumberFromSerial(const int length = 3)
 
 // ===============================================
 
+// unsigned int SX1509::readWord(byte registerAddress)
+unsigned int ____readWord(byte registerAddress)
+{
+    const uint8_t deviceAddress = 0x3E;
+
+
+	unsigned int readValue;
+	unsigned int msb, lsb;
+	unsigned int timeout = RECEIVE_TIMEOUT_VALUE * 2;
+
+	Wire.beginTransmission(deviceAddress);
+	Wire.write(registerAddress);
+	Wire.endTransmission();
+	Wire.requestFrom(deviceAddress, (byte) 2);
+
+	while ((Wire.available() < 2) && (timeout != 0))
+		timeout--;
+		
+	if (timeout == 0)
+		return 0;
+	
+	msb = (Wire.read() & 0x00FF) << 8;
+	lsb = (Wire.read() & 0x00FF);
+	readValue = msb | lsb;
+
+	return readValue;
+}
+
+// ===============================================
+
 void loop()
 {
 
@@ -298,20 +328,43 @@ void loop()
         bool atLeastOne = false;
         bool curOne;
 
-        for (int i = 0; i < 16; i++)
+        // _________________________________________
+        // REG_DATA_B -> 0x10
+        #define REG_DATA_B 0x10
+        unsigned int tempRegData = ____readWord(REG_DATA_B);
+
+        for (int pin = 0; pin < 16; pin++)
         {
-            // read pin per pin instead full BANK ! ;(
-            curOne = io.digitalRead(i) == HIGH;
-            if (states[i] != curOne)
+
+            if (pin == SX_LED0)
             {
-                // do not store if its an OUTPUT
-                if (i != SX_LED0)
-                {
-                    atLeastOne = true;
-                }
+                states[pin] = 0;
             }
-            states[i] = curOne;
+            else if (tempRegData & (1 << pin))
+            {
+                states[pin] = 1;
+            }
+            else
+            {
+                states[pin] = 0;
+            }
         }
+        // _________________________________________
+
+        // for (int i = 0; i < 16; i++)
+        // {
+        //     // read pin per pin instead full BANK ! ;(
+        //     curOne = io.digitalRead(i) == HIGH;
+        //     if (states[i] != curOne)
+        //     {
+        //         // do not store if its an OUTPUT
+        //         if (i != SX_LED0)
+        //         {
+        //             atLeastOne = true;
+        //         }
+        //     }
+        //     states[i] = curOne;
+        // }
 
         if (!gpioOnInterrupt)
         {
