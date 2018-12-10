@@ -22,13 +22,15 @@
  * 
  * SRM0   - GPIO Read Continuously
  * SRM1   - GPIO Read OnInterrupt
- * SRC    - GPIO Read Continue (or begin)
+ * SRM2   - GPIO Read OnDemand (respond states)
+ * SRC    - GPIO Read Continue (or begin) (for modes 0 & 1)
  * SRS    - GPIO Read Stop
  * 
  * MPL22  - PlayMp3 #22
  * MSP    - StopMp3
  * MPA    - PauseMp3
  * MNX    - NextMp3 
+ * MVL50  - VolumeMp3 50%
  * (....)
  * 
  * DSB    - Set Bauds of other Serial Port
@@ -118,6 +120,15 @@ int getPinID(char ch)
 // SX1509 I2C address (set by ADDR1 and ADDR0 (00 by default):
 const byte SX1509_ADDRESS = 0x3E; // SX1509 I2C address
 SX1509 io;                        // Create an SX1509 object to be used throughout
+
+void sendGPIOStates()
+{
+    for (int i = 0; i < 16; i++)
+    {
+        Serial.print(states[i] ? '1' : '0');
+    }
+    Serial.println();
+}
 
 // -==================-
 
@@ -305,11 +316,7 @@ void loop()
 
         if (!gpioCanceled && atLeastOne)
         {
-            for (int i = 0; i < 16; i++)
-            {
-                Serial.print(states[i] ? '1' : '0');
-            }
-            Serial.println();
+            sendGPIOStates();
         }
     } // end of SX iteration
 
@@ -346,10 +353,16 @@ void loop()
                     {
                         if (cmd[2] == 'M')
                         {
-                            // SRM0
+                            // ex. SRM0
                             // sets the GPIO reading mode
-                            int val = Serial.read() == '0' ? 0 : 1;
-                            gpioOnInterrupt = val == 1;
+                            char val = Serial.read();
+                            int mode = val - '0';
+                            gpioOnInterrupt = mode == 1; // on interrupt
+                            gpioCanceled = true;
+                            if (mode == 2) // on demand
+                            {
+                                sendGPIOStates();
+                            }
                         }
                         else if (cmd[2] == 'C')
                         {
