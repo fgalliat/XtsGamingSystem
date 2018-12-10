@@ -36,7 +36,7 @@ void Serial::write(void* data, size_t len) {
   if ( _uart_failed ) { return; }
   uart_write(data, len);
 }
-ssize_t Serial::read(void* buffer, size_t charsToRead) {
+size_t Serial::read(void* buffer, size_t charsToRead) {
   if ( _uart_failed ) { return 0; }
   return uart_read(buffer, charsToRead);
 }
@@ -112,7 +112,7 @@ void uart_write(void* data, size_t len) {
 	write(uartFd, data, len); 
 }
 
-ssize_t uart_read(void* buffer, size_t charsToRead) {
+size_t uart_read(void* buffer, size_t charsToRead) {
 	return read(uartFd, buffer, charsToRead); 
 }
 

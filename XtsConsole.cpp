@@ -32,9 +32,11 @@ static WiredScreen screen;
 static Serial Serial1("/dev/ttyS2", 9600);
 static SoundCard snd( &Serial1 );
 
-// static auto gpio = SX1509();
+#ifndef NEW_SERIAL_GPIO
+static auto gpio = SX1509();
+#else
 static auto gpio = GpioOverArduino( &Serial1 );
-
+#endif
 
 static Pad pad = Pad();
 
