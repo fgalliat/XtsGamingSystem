@@ -59,7 +59,7 @@ bool Pad::bt1()    { return this->_bt1; }
 bool Pad::bt2()    { return this->_bt2; }
 bool Pad::start()  { return this->_btStart; }
 
-#define PAD_TIME_CHECK 1
+// #define PAD_TIME_CHECK 1
 
 #ifdef PAD_TIME_CHECK
   long long xts_lastTime = 0;
