@@ -1,5 +1,5 @@
 #include <errno.h>
-#include <fcntl.h> 
+#include <fcntl.h>
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
@@ -13,128 +13,157 @@
 /* use omega UART1 */
 // const char *portname = "/dev/ttyS1";
 char *portname = NULL;
-int uartFd = -1; 
+int uartFd = -1;
 bool _uart_failed = false;
-
 
 // ==========================================================
 #define LG_BUFFER 1024
 
-void Serial::writestr(const char* string) {
-	putchar( (char*) string,strlen(string));
+void Serial::writestr(const char *string)
+{
+	putchar((char *)string, strlen(string));
 }
-void Serial::write(void* data, size_t len) {
-	putchar((char*)data,len);
+void Serial::write(void *data, size_t len)
+{
+	putchar((char *)data, len);
 }
 
-size_t Serial::read(void* buffer, size_t charsToRead) {
-//   if ( _uart_failed ) { return 0; }
-//   return uart_read(buffer, charsToRead);
-int read = readSerial();
+size_t Serial::read(void *buffer, size_t charsToRead)
+{
+	int read = readSerial();
 
-if ( read <= 0 ) { return read; }
-memcpy(buffer, getBuff(), read);
+	if (read <= 0)
+	{
+		return read;
+	}
+	memcpy(buffer, getBuff(), read);
 
-return read;
+	return read;
 }
 
 // #define DBUG_SERIAL 1
 
+int nb_read;
+unsigned char buffer[LG_BUFFER];
+struct termios tio;
+int tty_fd;
 
-		int nb_read ;
-		unsigned char buffer[LG_BUFFER] ;
-		struct termios tio ;
-		int tty_fd ;
-		
-		void setspeed(speed_t vitesse) {
-			cfsetospeed(&tio, vitesse) ; 
-			cfsetispeed(&tio, vitesse) ;
-			tcsetattr(tty_fd,TCSANOW,&tio) ;
-		}
-		
-		Serial::Serial(const char *acm = "/dev/ttyACM0", int vitesse/* = 9600*/) {
+void setspeed(speed_t vitesse)
+{
+	cfsetospeed(&tio, vitesse);
+	cfsetispeed(&tio, vitesse);
+	tcsetattr(tty_fd, TCSANOW, &tio);
+}
 
-			memset(&tio,0,sizeof(tio)) ;
-			tio.c_iflag=0 ; //IGNPAR ;
-			tio.c_oflag=0 ;
-			tio.c_cflag=CS8|CREAD|CLOCAL ; // 8n1, see termios.h for more information
-			tio.c_lflag=0 ;
-			tio.c_cc[VMIN]=1 ;
-			tio.c_cc[VTIME]=5 ;
-			
-			tty_fd = open( acm, O_RDWR | O_NONBLOCK) ; 
-			if(tty_fd < 0) { 
-				perror("open") ;
-				printf("file => %s\n", acm) ;
-				// exit(EXIT_FAILURE) ;
-			} else {
-				this->setBaud(vitesse) ;
-			}
-		}
+Serial::Serial(const char *acm = "/dev/ttyACM0", int vitesse /* = 9600*/)
+{
 
-		void Serial::setBaud(int vitesse) {
-		
-			if (vitesse < 51)	setspeed(B50) ;
-			else if (vitesse < 76)	setspeed(B75) ;
-			else if (vitesse < 111)	setspeed(B110) ;
-			else if (vitesse < 135)	setspeed(B134) ;
-			else if (vitesse < 151)	setspeed(B150) ;
-			else if (vitesse < 201)	setspeed(B200) ;
-			else if (vitesse < 301)	setspeed(B300) ;
-			else if (vitesse < 601)	setspeed(B600) ;
-			else if (vitesse < 1201)	setspeed(B1200) ;
-			else if (vitesse < 1801)	setspeed(B1800) ;
-			else if (vitesse < 2401)	setspeed(B2400) ;
-			else if (vitesse < 4801)	setspeed(B4800) ;
-			else if (vitesse < 9601)	setspeed(B9600) ;
-			else if (vitesse < 19201)	setspeed(B19200) ;
-			else if (vitesse < 34001)	setspeed(B38400) ;
-			else if (vitesse < 57601)	setspeed(B57600) ;
-			else 	setspeed(B115200) ;
-		}
+	memset(&tio, 0, sizeof(tio));
+	tio.c_iflag = 0; //IGNPAR ;
+	tio.c_oflag = 0;
+	tio.c_cflag = CS8 | CREAD | CLOCAL; // 8n1, see termios.h for more information
+	tio.c_lflag = 0;
+	tio.c_cc[VMIN] = 1;
+	tio.c_cc[VTIME] = 5;
 
-		void Serial::putchar(char c) {
-			::write(tty_fd,&c,1) ;
-		}
+	tty_fd = open(acm, O_RDWR | O_NONBLOCK);
+	if (tty_fd < 0)
+	{
+		perror("open");
+		printf("file => %s\n", acm);
+		// exit(EXIT_FAILURE) ;
+	}
+	else
+	{
+		this->setBaud(vitesse);
+	}
+}
 
-		void Serial::putchar(char *c, int n) {
-			::write(tty_fd,c,n) ;
-		}
+void Serial::setBaud(int vitesse)
+{
 
-		int Serial::readSerial() {
-			// en attendant la nouvelle version
-			nb_read = ::read(tty_fd, buffer, LG_BUFFER) ;
-			
-			#ifdef DBUG_SERIAL
-			// putputs to stdout
-			::write(STDOUT_FILENO, buffer, nb_read) ;
-			#endif
-			return nb_read;
-		}
+	if (vitesse < 51)
+		setspeed(B50);
+	else if (vitesse < 76)
+		setspeed(B75);
+	else if (vitesse < 111)
+		setspeed(B110);
+	else if (vitesse < 135)
+		setspeed(B134);
+	else if (vitesse < 151)
+		setspeed(B150);
+	else if (vitesse < 201)
+		setspeed(B200);
+	else if (vitesse < 301)
+		setspeed(B300);
+	else if (vitesse < 601)
+		setspeed(B600);
+	else if (vitesse < 1201)
+		setspeed(B1200);
+	else if (vitesse < 1801)
+		setspeed(B1800);
+	else if (vitesse < 2401)
+		setspeed(B2400);
+	else if (vitesse < 4801)
+		setspeed(B4800);
+	else if (vitesse < 9601)
+		setspeed(B9600);
+	else if (vitesse < 19201)
+		setspeed(B19200);
+	else if (vitesse < 34001)
+		setspeed(B38400);
+	else if (vitesse < 57601)
+		setspeed(B57600);
+	else
+		setspeed(B115200);
+}
 
-		void Serial::close() {
-			if (::close(tty_fd)<0) printf("err close serial\n") ;
-			// exit(EXIT_FAILURE) ;
-		}
-		
-		unsigned char* Serial::getBuff() { return buffer; }
+void Serial::putchar(char c)
+{
+	::write(tty_fd, &c, 1);
+}
+
+void Serial::putchar(char *c, int n)
+{
+	::write(tty_fd, c, n);
+}
+
+int Serial::readSerial()
+{
+	// en attendant la nouvelle version
+	nb_read = ::read(tty_fd, buffer, LG_BUFFER);
+
+#ifdef DBUG_SERIAL
+	// putputs to stdout
+	::write(STDOUT_FILENO, buffer, nb_read);
+#endif
+	return nb_read;
+}
+
+void Serial::close()
+{
+	if (::close(tty_fd) < 0)
+		printf("err close serial\n");
+	// exit(EXIT_FAILURE) ;
+}
+
+unsigned char *Serial::getBuff() { return buffer; }
 
 // ==========================================================
 
-
 // Serial::Serial(const char *_portname, int speed) {
 //   portname = (char*)_portname;
-  
+
 //   int blocking = 0;
 //   //blocking = 1;
-  
+
 //   if(! (uart_open(portname, speed == 115200 ? B115200 : B9600, blocking) > 0) ) {
 // 	_uart_failed = true;
 //         printf("FAILED TO OPEN 'Serial' !!! \n");
 //   }
 // }
-Serial::~Serial() {
-
+Serial::~Serial()
+{
 }
 
 // void Serial::writestr(const char* string) {
@@ -149,7 +178,6 @@ Serial::~Serial() {
 //   if ( _uart_failed ) { return 0; }
 //   return uart_read(buffer, charsToRead);
 // }
-
 
 // ==============================================================================
 
@@ -173,9 +201,9 @@ Serial::~Serial() {
 //         tty.c_lflag = 0;                // no signaling chars, no echo,
 //                                         // no canonical processing
 //         tty.c_oflag = 0;                // no remapping, no delays
-        
+
 //         tty.c_cc[VMIN]  = 0;            // read doesn't block
-        
+
 //         // tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
 //         tty.c_cc[VTIME] = 2;            // 0.2 seconds read timeout
 
@@ -213,19 +241,16 @@ Serial::~Serial() {
 //                 fprintf (stderr, "error %d setting term attributes", errno);
 // }
 
-
-
-
 // void uart_writestr(const char* string) {
 // 	write(uartFd, string, strlen(string));
-// }	
+// }
 
 // void uart_write(void* data, size_t len) {
-// 	write(uartFd, data, len); 
+// 	write(uartFd, data, len);
 // }
 
 // size_t uart_read(void* buffer, size_t charsToRead) {
-// 	return read(uartFd, buffer, charsToRead); 
+// 	return read(uartFd, buffer, charsToRead);
 // }
 
 // int uart_open(const char* port, int baud, int blocking) {
@@ -238,7 +263,6 @@ Serial::~Serial() {
 // 	int ok = set_interface_attribs (uartFd, baud, 0);  // set speed, 8n1 (no parity)
 //         if ( ok < 0 ) { return -1; }
 // 	set_blocking (uartFd, blocking); //set blocking mode
-// 	printf("Port %s opened.\n", port); 
+// 	printf("Port %s opened.\n", port);
 // 	return 1;
 // }
-

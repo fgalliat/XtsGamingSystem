@@ -24,13 +24,17 @@ extern void delay(int time);
 GpioOverArduino::GpioOverArduino(Serial *serial) { this->serial = serial; }
 GpioOverArduino::~GpioOverArduino() {}
 
-bool GpioOverArduino::init()
+bool GpioOverArduino::init(bool reset)
 {
 
     // this->serial->writestr("SRM2"); // mode 2 (on demand)
 
-    //this->serial->writestr("RST"); // RESET
-    // delay(300);
+    if (reset)
+    {
+        printf("Reseting Arduino...\n");
+        this->serial->writestr("RST"); // RESET
+        delay(3000);
+    }
 
     char garbageFlushRX[128 + 1];
     int readed = this->serial->read(garbageFlushRX, 128);
@@ -75,30 +79,24 @@ char *GpioOverArduino::readAllPins()
     }
 
     static char buffer[16 + 1 + 1]; //  +1 '\n' +1 '\0'
-    // static char term[1] = {0x00};
-    static char CRLF[2] = {0x00, 0x00};
     memset(buffer, 0x00, 16 + 0 + 1);
 
     this->serial->writestr("SRM2"); // mode 2 (on demand)
-    // this->serial->writestr("SRM"); // mode 2 (on demand)
-    // delay(2);
-    // this->serial->writestr("2");   // mode 2 (on demand)
 
     // TODO : lock Serial.write ....
 
     delay(80); // less time makes Serial Reading hanging
-    int readed = this->serial->read(buffer, 16+1);
-
+    int readed = this->serial->read(buffer, 16 + 1);
     // printf("f:%d bytes read\n", readed);
     // printf("s:%s bytes read\n", buffer);
 
-    if (readed != 16+1)
+    if (readed != 16 + 1)
     {
         // printf("Oups %d \n", readed);
         return NULL;
     }
 
-	delay(10);
+    delay(10);
 
     return buffer;
 }

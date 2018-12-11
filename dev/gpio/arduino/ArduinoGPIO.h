@@ -12,7 +12,7 @@ private:
 public:
   GpioOverArduino(Serial *serial);
   ~GpioOverArduino();
-  bool init();
+  bool init(bool reset = false);
   void close();
   void stop();
   char *readAllPins();
