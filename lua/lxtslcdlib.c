@@ -72,6 +72,16 @@ static int lcd_cursor (lua_State *L) {
 }
 
 
+static int lcd_rgb (lua_State *L) {
+	int r = (int)luaL_optinteger(L, 1, EXIT_SUCCESS);
+	int g = (int)luaL_optinteger(L, 2, EXIT_SUCCESS);
+	int b = (int)luaL_optinteger(L, 3, EXIT_SUCCESS);
+	
+	lua_pushinteger( L, rgb16(r,g,b) );
+	return 1;
+}
+
+
 static int lcd_print (lua_State *L) {
   const char *str = luaL_optstring(L, 1, NULL);
   
@@ -300,6 +310,7 @@ static const luaL_Reg xtslcdlib[] = {
   {"print",   lcd_print},
   
   {"cursor",  lcd_cursor},
+  {"rgb",  lcd_rgb},
 
   {"rect",     lcd_rect},
   {"circle",   lcd_circle},
