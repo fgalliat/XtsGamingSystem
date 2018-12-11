@@ -91,6 +91,7 @@ CHOICES = {
                                 { lbl="Script >",  items={ {lbl="Demo",    script="test.lua"}, 
                                                            {lbl="Raycast", script="rcmoa.lua"}, 
                                                            {lbl="Tetris",   script="tetris.lua"}, 
+                                                           {lbl="OutRun",   script="outrun.lua"}, 
                                                            {lbl="Sound",   script="sound.lua"} } },
                                 { lbl="Native >",  items={} },
                                 { lbl="Bash",      exec="/bin/bash" } } },

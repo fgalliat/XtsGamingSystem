@@ -1,10 +1,23 @@
 stopped = true
 
+consoleStartTime = os.clock()
+timer = {
+   -- consoleStartTime = os.clock(),
+
+   getMilliSecCounter = function()
+     return os.clock() - consoleStartTime;
+   end
+}
+
+
+
+
+
 function start()
   lastKeyDown = 0
   stopped = false
   engineInit() 
- 
+--[[ 
   on.timer = tick 
   quit = function() 
     stopped = true 
@@ -12,7 +25,7 @@ function start()
   end 
   -- 50ms period in seconds 
   timer.start(0.015) 
-
+]]--
   
 end 
 
@@ -86,7 +99,7 @@ function computeSegment(z)
   
   	-- ============ main road part ===========
   	-- instanciate a 'Trapeze' via init(...)
-  	local t = Trapeze( oldRoadWidth, oldZ+horizonLine, roadWidth, initZ+horizonLine, #roadPart  )
+  	local t = Trapeze.new( oldRoadWidth, oldZ+horizonLine, roadWidth, initZ+horizonLine, #roadPart  )
   	roadPart[#roadPart+1] = t
   	oldRoadWidth = roadWidth
   				
@@ -116,18 +129,27 @@ function drawTrapeze(gc, top,bottom,leftT,rightT,leftB,rightB)
   gc:fillPolygon( { leftB, bottom, rightB, bottom, rightT, top, leftT, top } ) 
 end 
 
-Trapeze = class()
-
 -- for class() ==>> constructor must been called init(...)
-function Trapeze:init(bottomBase, bottomHeight, upperBase, upperHeight, idx)
+--Trapeze = class()
+Trapeze = {}
+Trapeze.__index = Trapeze
+
+
+function Trapeze.new(bottomBase, bottomHeight, upperBase, upperHeight, idx)
+  local self = setmetatable({}, Trapeze)
+
+-- function Trapeze:init(bottomBase, bottomHeight, upperBase, upperHeight, idx)
   self.bottomBase = bottomBase
   self.bottomHeight = bottomHeight
   self.upperBase = upperBase
   self.upperHeight = upperHeight
   self.idx = idx
+  
+return self;
 end
 
  function Trapeze:draw(gc, middle, middle2, drawIdx)
+ 
        -- if too slow : change color / draw all odd seg. // change color / draw all even
        if (math.fmod(drawIdx,2)==1) then 
          gc:setColorRGB(150, 150, 150) 
@@ -151,6 +173,8 @@ end
        local yuMod = camera.y * self.idx;
 
        drawTrapeze(gc, self.upperHeight+yuMod,self.bottomHeight+ylMod,xu1,xu2,xb1,xb2)
+       
+
  end
   
 
@@ -202,7 +226,16 @@ function renderRoad(gc, delta)
           m = WIDTH / 2
           lastM = m
         end
-        roadPart[i]:draw( gc, lastM, m, i+delta)
+        
+        --print( roadPart[i].draw )
+        
+        if ( roadPart == nil or roadPart[i] == nil ) then
+          print("Road #"..i.. " is null" )
+        else
+          roadPart[i]:draw( gc, lastM, m, i+delta)
+        end
+        
+        
         -- draw sides
         m = lastM
     
@@ -218,7 +251,7 @@ function renderRoad(gc, delta)
     end
 end
 
-function on.paint(gc)
+function on_paint(gc)
   if ( not inited ) then return end
    
   renderRoad(gc, roadCpt)
@@ -239,7 +272,7 @@ end
 
 lastKeyDown = -1
 firstKey = false
-function on.arrowKey(key) 
+function on_arrowKey(key) 
 
 if ( lastKeyDown == 0 and not firstKey ) then
   firstKey = true
@@ -270,7 +303,7 @@ end
  
 end 
 
-function on.escapeKey() 
+function on_escapeKey() 
   if ( not stopped ) then
     quit() 
   else
@@ -284,7 +317,7 @@ SPEEDMAX = 10
 --speed = SPEEDMAX-1
 speed = 0
 
-function on.charIn(char)
+function on_charIn(char)
   if ( char == "+" and speed < SPEEDMAX ) then
     speed = speed + 1
   elseif ( char == "-" and speed > 0 ) then
@@ -331,13 +364,13 @@ function tick()
       end
   end 
   
-  platform.window:invalidate()
+  -- platform.window:invalidate()
 end 
 
 -- do not start() in IDE mode 
 -- tick() will be called instead 
 -- start() 
-
+--[[
 function on.activate()
   start()
 end
@@ -345,3 +378,76 @@ end
 function on.desactivate()
   quit()
 end
+]]--
+
+
+gc = {
+  __innerColor = 0,
+
+  setColorRGB = function(self, r,g,b)
+    self.__innerColor  = lcd.rgb(r,g,b)
+  end , 
+  
+  fillRect = function(self, x,y,w,h)
+    lcd.rect(math.floor(x),math.floor(y),math.floor(w),math.floor(h),1,self.__innerColor)
+  end , 
+  
+  fillPolygon = function(self,  pts_arry )
+    lcd.line( math.floor(pts_arry[1]), math.floor(pts_arry[2]), math.floor(pts_arry[3]), math.floor(pts_arry[4]),  self.__innerColor );
+    lcd.line( math.floor(pts_arry[3]), math.floor(pts_arry[4]), math.floor(pts_arry[5]), math.floor(pts_arry[6]),  self.__innerColor );
+    lcd.line( math.floor(pts_arry[7]), math.floor(pts_arry[8]), math.floor(pts_arry[1]), math.floor(pts_arry[2]),  self.__innerColor );
+  end , 
+  
+  drawString = function(self,  str, x, y )
+    --lcd.cursor( math.floor(x), math.floor(y) );
+    --lcd.print( str );
+  end
+}
+
+
+
+function main()
+  print("Let's go !")
+  
+  start()
+  
+  while( true ) do
+    local pads = pad.read()
+    
+    if ( pads.start ) then
+      -- on_escapeKey
+      break
+    elseif ( pads.A ) then
+      on_charIn('+')
+    elseif ( pads.B ) then
+      on_charIn('-')
+    end
+
+    if ( pads.left ) then
+      on_arrowKey("left")
+    elseif ( pads.right ) then
+      on_arrowKey("right")  
+    end
+      
+    if ( pads.up ) then
+      on_arrowKey("up")
+    elseif ( pads.down ) then
+      on_arrowKey("down")        
+    end
+      
+    tick()
+    
+      -- platform.window:invalidate()
+      -- reaquests for on_paint
+on_paint( gc )
+
+    
+    lcd.delay(30)
+  end
+  
+end
+
+
+main()
+
+
