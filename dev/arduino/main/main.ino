@@ -99,6 +99,8 @@ const int pins[16][2] = {
     {UNDEFINED, UNDEFINED},    // F - N/C
 };
 
+unsigned int __I2c__readWord(byte registerAddress);
+
 bool states[16];
 
 const char *pinIDs = "0123456789ABCDEF";
@@ -119,7 +121,68 @@ int getPinID(char ch)
 
 // SX1509 I2C address (set by ADDR1 and ADDR0 (00 by default):
 const byte SX1509_ADDRESS = 0x3E; // SX1509 I2C address
-SX1509 io;                        // Create an SX1509 object to be used throughout
+#define REG_DATA_B 0x10
+SX1509 io; // Create an SX1509 object to be used throughout
+
+// SRM0 coutinous stream
+// SRM1 onIntterupt stream
+// SRM2 onDemaand stream
+
+#define SRM0 0
+#define SRM1 1
+#define SRM2 2
+int gpioMode = SRM2;
+
+bool gpioCanceled = true; // have to call 'SRC' to display it again
+
+bool fetchGPIOStates()
+{
+    bool atLeastOne = false;
+    // _________________________________________
+    // REG_DATA_B -> 0x10
+    unsigned int tempRegData = __I2c__readWord(REG_DATA_B);
+
+    for (int pin = 0; pin < 16; pin++)
+    {
+        bool curOne = false;
+        // if (pin == SX_LED0)
+        if (pins[pin][0] == OUTPUT)
+        {
+            curOne = false;
+        }
+        else if (tempRegData & (1 << pin))
+        {
+            curOne = true;
+        }
+        else
+        {
+            curOne = false;
+        }
+
+        if (curOne != states[pin])
+        {
+            atLeastOne = true;
+        }
+        states[pin] = curOne;
+    }
+    // _________________________________________
+
+    // for (int i = 0; i < 16; i++)
+    // {
+    //     // read pin per pin instead full BANK ! ;(
+    //     curOne = io.digitalRead(i) == HIGH;
+    //     if (states[i] != curOne)
+    //     {
+    //         // do not store if its an OUTPUT
+    //         if (i != SX_LED0)
+    //         {
+    //             atLeastOne = true;
+    //         }
+    //     }
+    //     states[i] = curOne;
+    // }
+    return atLeastOne;
+}
 
 void sendGPIOStates()
 {
@@ -187,9 +250,6 @@ bool OK_DFPLAY = false;
 #define MODE_SMARTKEY_PROXY 1
 #define MODE_SERIAL_PROXY 2
 int serialMode = MODE_NO_PROXY;
-
-bool gpioOnInterrupt = false;
-bool gpioCanceled = true; // have to call 'SRC' to display it again
 // -==================-
 
 // builtin led
@@ -290,31 +350,30 @@ int readNumberFromSerial(const int length = 3)
 // ===============================================
 
 // unsigned int SX1509::readWord(byte registerAddress)
-unsigned int ____readWord(byte registerAddress)
+unsigned int __I2c__readWord(byte registerAddress)
 {
     const uint8_t deviceAddress = 0x3E;
 
+    unsigned int readValue;
+    unsigned int msb, lsb;
+    unsigned int timeout = RECEIVE_TIMEOUT_VALUE * 2;
 
-	unsigned int readValue;
-	unsigned int msb, lsb;
-	unsigned int timeout = RECEIVE_TIMEOUT_VALUE * 2;
+    Wire.beginTransmission(deviceAddress);
+    Wire.write(registerAddress);
+    Wire.endTransmission();
+    Wire.requestFrom(deviceAddress, (byte)2);
 
-	Wire.beginTransmission(deviceAddress);
-	Wire.write(registerAddress);
-	Wire.endTransmission();
-	Wire.requestFrom(deviceAddress, (byte) 2);
+    while ((Wire.available() < 2) && (timeout != 0))
+        timeout--;
 
-	while ((Wire.available() < 2) && (timeout != 0))
-		timeout--;
-		
-	if (timeout == 0)
-		return 0;
-	
-	msb = (Wire.read() & 0x00FF) << 8;
-	lsb = (Wire.read() & 0x00FF);
-	readValue = msb | lsb;
+    if (timeout == 0)
+        return 0;
 
-	return readValue;
+    msb = (Wire.read() & 0x00FF) << 8;
+    lsb = (Wire.read() & 0x00FF);
+    readValue = msb | lsb;
+
+    return readValue;
 }
 
 // ===============================================
@@ -324,58 +383,18 @@ void loop()
 
     if (OK_SX1509 && serialMode == MODE_NO_PROXY)
     {
-        // @ least one state has changed
-        bool atLeastOne = false;
-        bool curOne;
-
-        // _________________________________________
-        // REG_DATA_B -> 0x10
-        #define REG_DATA_B 0x10
-        unsigned int tempRegData = ____readWord(REG_DATA_B);
-
-        for (int pin = 0; pin < 16; pin++)
+        if (!gpioCanceled && (gpioMode == SRM0 || gpioMode == SRM1))
         {
 
-            if (pin == SX_LED0)
+            // @ least one state has changed
+            bool atLeastOne = fetchGPIOStates();
+
+            if (gpioMode == SRM0 || (gpioMode == SRM1 && atLeastOne))
             {
-                states[pin] = 0;
-            }
-            else if (tempRegData & (1 << pin))
-            {
-                states[pin] = 1;
-            }
-            else
-            {
-                states[pin] = 0;
+                sendGPIOStates();
             }
         }
-        // _________________________________________
 
-        // for (int i = 0; i < 16; i++)
-        // {
-        //     // read pin per pin instead full BANK ! ;(
-        //     curOne = io.digitalRead(i) == HIGH;
-        //     if (states[i] != curOne)
-        //     {
-        //         // do not store if its an OUTPUT
-        //         if (i != SX_LED0)
-        //         {
-        //             atLeastOne = true;
-        //         }
-        //     }
-        //     states[i] = curOne;
-        // }
-
-        if (!gpioOnInterrupt)
-        {
-            // always send before any cmd parsed
-            atLeastOne = true;
-        }
-
-        if (!gpioCanceled && atLeastOne)
-        {
-            sendGPIOStates();
-        }
     } // end of SX iteration
 
     // -=== main Serial loop iteration ===-
@@ -414,11 +433,11 @@ void loop()
                             // ex. SRM0
                             // sets the GPIO reading mode
                             char val = Serial.read();
-                            int mode = val - '0';
-                            gpioOnInterrupt = mode == 1; // on interrupt
+                            gpioMode = val - '0';
                             gpioCanceled = true;
-                            if (mode == 2) // on demand
+                            if (gpioMode == SRM2) // on demand
                             {
+                                fetchGPIOStates();
                                 sendGPIOStates();
                             }
                         }
@@ -546,5 +565,5 @@ void loop()
         }
     }
 
-    delay(5);
+    delay(15);
 }
