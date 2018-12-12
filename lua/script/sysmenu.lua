@@ -286,9 +286,9 @@ while true do
                     break
                 end
 
-                delay(100)
+                delay(50)
             end
-            delay(100)
+            delay(50)
             if ( doesReturn ) then break; end
         end
     end
