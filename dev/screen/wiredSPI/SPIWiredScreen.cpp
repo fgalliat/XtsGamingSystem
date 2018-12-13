@@ -146,7 +146,7 @@
     }
 
 
-	void WiredScreen::dispStr(char* str, int x, int y, uint16_t color=CLR_WHITE) {
+	void WiredScreen::dispStr(char* str, int x, int y, uint16_t color) {
     	if ( str == NULL ) { return; }
     	int len = strlen( str );
     	char ch;

@@ -81,7 +81,7 @@
         void print(float val);
         void print(char* str);
         void println(char* str);
-        void dispStr(char* str, int x, int y, uint16_t color=CLR_WHITE)
+        void dispStr(char* str, int x, int y, uint16_t color=CLR_WHITE);
 
         void drawBPP(char* name, int x, int y);
         void drawPCT(char* name, int x, int y);
