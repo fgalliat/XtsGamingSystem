@@ -23,13 +23,15 @@
  
 -- ==========={ Music Preparing }=======
 print("Let's go !")
-  lcd.rect(0,0,320,240,1,8)
+  -- lcd.rect(0,0,320,240,1,8)
+  lcd.cls()
+  lcd.pct( "/GODSFNT.PCT", (320-160)/2, (240-128)/2 )
   
   snd.stop() 
   -- snd.setvolume(40)
   lcd.delay(100)
   --snd.pause()
-  snd.setvolume(20)
+  snd.setvolume(15)
   lcd.delay(1000) -- need a long pause after setvolume
   
 -- local music = "./MUSIC/Automation_CD_Menu_186_Music_Atari_ST.mp3"
@@ -68,6 +70,33 @@ local screenIter = 0
 local yetPlayingMusic = false
 
 white = 1
+
+-- prepare font
+lcd.sprite( "/GODSFNT.PCT", (320-160)/2, (240-128)/2, 16, 16, 0,0 )
+--          0        1         2         3         4
+--          1234567890123456789012345678901234567890123
+ALPHABET = "ABCDEFGHIJKMNOPQRSTUVWXYZ 0123456789<$>._:"
+function findChar(ch)
+	local n = string.find( ALPHABET, ""..ch, 1, true )
+	if ( n == nil ) then return -1 end
+	return n
+end
+
+function parseText(str)
+	local st2 = ""
+	local stc= {}
+	local i
+	for i=1, str:len() do
+		local ch = string.sub(str, i,i) -- get one char
+		ch = string.upper(ch)
+		-- print( ch )
+		local nn = findChar( ch )
+		if ( nn == -1 ) then nn = 42 end -- replace by '...' ('_')
+		st2 = st2.. string.sub(ALPHABET, nn,nn)
+		stc[i] = nn
+	end
+	return st2, stc
+end
 
 while true do
 	lcd.cls() -- NIT YET done by NFX
@@ -111,6 +140,26 @@ while true do
  	-- drawStarFieldFrame(screenIter)
  	lcd.fx(1)
  	
+ 	-- lcd.sprite( "/.PCT", (320-160)/2, (240-128)/2, 16, 16, 0,0 )
+ 	lcd.sprite( nil, (320-160)/2, (240-128)/2, 16, 16, 0,0 )
+ 	lcd.sprite( nil, ((320-160)/2)+16+1, (240-128)/2, 16, 16, 17,17 )
+ 	
+ 	
+ 	local str,stc = parseText( "abCf4#67<.:" )
+ 	lcd.dispStr( str, 10, 120, white )
+ 	
+ 	-- lcd.dispStr( parseText( "abCf4#67<.:" ), 10, 120, white )
+ 	-- print( #stc )
+ 	local i
+ 	local x=10
+ 	local y=180
+ 	local xx = 0
+ 	local yy = 0
+ 	for i = 1, #stc do
+ 		xx = math.fmod( (stc[i]-1), 9 )
+ 		yy = math.floor( (stc[i]-1) / 9 )
+ 		lcd.sprite( nil, x+( (i-1)*17 ), y, 16, 16, xx*17,yy*17 )
+ 	end
  	
  	lcd.dispStr( "Starfield for PSP by Shine", 10, 222, white)
  	lcd.dispStr( "Modififed for YOU by Xtase", 10, 232, white)
