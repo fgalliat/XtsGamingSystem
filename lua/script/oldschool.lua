@@ -70,8 +70,7 @@ local yetPlayingMusic = false
 white = 1
 
 while true do
-	-- screen:clear(black)
-	lcd.cls()
+	lcd.cls() -- NIT YET done by NFX
  	
  	-- ===== Music Playback ========
  	if ( playMusic ) then
@@ -143,8 +142,10 @@ while true do
 	-- screen:flip()
 	screenIter = screenIter + 1
 	
-	if pad.read().start then break end
-	if pad.read().A then break end
+	local pads = pad.read()
+	
+	if pads.start then break end
+	if pads.A then break end
 end
 
 snd.stop()
