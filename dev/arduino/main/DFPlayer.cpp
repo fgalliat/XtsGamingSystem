@@ -226,6 +226,7 @@ bool SoundCard::init()
 	delay(500);
 
 	this->volume(_snd_vol);
+	_snd_isPlaying = false;
 
 	return true;
 }
@@ -248,6 +249,7 @@ void SoundCard::play(int track)
 
 	_snd_trackNum = track;
 	execute_CMD(this->serial, 0x03, (uint8_t)(track >> 8), (uint8_t)(track)); // play track 1 from SDCARD
+	_snd_isPlaying = true;
 	delay(100);
 }
 
@@ -294,12 +296,14 @@ void SoundCard::next()
 {
 	_snd_trackNum++;
 	execute_CMD(this->serial, 0x01, 0, 1);
+	_snd_isPlaying = true;
 	delay(100);
 }
 void SoundCard::prev()
 {
 	_snd_trackNum--; // TODO : optional mod to _snd_trackNb
 	execute_CMD(this->serial, 0x02, 0, 1);
+	_snd_isPlaying = true;
 	delay(100);
 }
 
