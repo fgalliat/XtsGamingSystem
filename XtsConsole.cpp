@@ -24,6 +24,18 @@
 
 // ==================================================
 
+// exposed to extern
+bool __ext_mp3Playing();
+
+long long __g_now()
+{
+	struct timeval te;
+	gettimeofday(&te, NULL);										 // get current time
+	long long milliseconds = te.tv_sec * 1000LL + te.tv_usec / 1000; // calculate milliseconds
+	// printf("milliseconds: %lld\n", milliseconds);
+	return milliseconds;
+}
+
 // ==================================================
 static WiredScreen screen;
 
@@ -63,6 +75,26 @@ bool Pad::start() { return this->_btStart; }
 long long xts_lastTime = 0;
 #endif
 
+long long xts_lastBanksTime = -1;
+
+bool __ext_mp3PlayingValue = false;
+bool __ext_mp3Playing() {
+	
+	if ( xts_lastBanksTime <= 0 || __g_now() - xts_lastBanksTime > 500 ) {
+		char *banks = gpio.readAllPins();
+		if (banks == NULL)
+		{
+			return false;
+		}
+		
+		__ext_mp3PlayingValue = gpio.isMP3Playing(banks);
+		xts_lastBanksTime = __g_now();
+	}
+	
+	return __ext_mp3PlayingValue;
+}
+
+
 bool Pad::checkBtns()
 {
 	if (!_gpioOK)
@@ -71,6 +103,11 @@ bool Pad::checkBtns()
 	}
 
 #ifdef NEW_SERIAL_GPIO
+
+	// if ( xts_lastBanksTime <= 0 ) {
+	// 	xts_lastBanksTime = __g_now();
+	// }
+
 	char *banks = gpio.readAllPins();
 	if (banks == NULL)
 	{
@@ -85,6 +122,9 @@ bool Pad::checkBtns()
 	this->_left = gpio.isAButtonPressed(banks, DIR_LEFT_PIN);
 	this->_right = gpio.isAButtonPressed(banks, DIR_RIGHT_PIN);
 	this->_down = gpio.isAButtonPressed(banks, DIR_DOWN_PIN);
+	
+	__ext_mp3PlayingValue = gpio.isMP3Playing(banks);
+	xts_lastBanksTime = __g_now();
 
 #else
 #ifdef XTSCONSOLE
@@ -117,7 +157,6 @@ bool Pad::checkBtns()
 	return true;
 }
 
-// =======================
 
 SoundCard *XtsConsole::getSoundCard() { return &snd; }
 WiredScreen *XtsConsole::getScreen() { return &screen; }
@@ -277,12 +316,9 @@ void XtsConsole::reset()
 
 long long XtsConsole::now()
 {
-	struct timeval te;
-	gettimeofday(&te, NULL);										 // get current time
-	long long milliseconds = te.tv_sec * 1000LL + te.tv_usec / 1000; // calculate milliseconds
-	// printf("milliseconds: %lld\n", milliseconds);
-	return milliseconds;
+	return __g_now();
 }
+
 
 void XtsConsole::delay(int time)
 {

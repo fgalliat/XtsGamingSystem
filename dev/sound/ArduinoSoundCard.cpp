@@ -20,6 +20,8 @@
 #include "../serial/Serial.h"
 #include "SoundCard.h"
 
+extern bool __ext_mp3Playing();
+
 void _error(char *str)
 {
 	printf("(EE) ");
@@ -290,6 +292,7 @@ void SoundCard::prev()
 
 bool SoundCard::isPlaying()
 {
+	_snd_isPlaying = __ext_mp3Playing();
 	return _snd_isPlaying;
 }
 
