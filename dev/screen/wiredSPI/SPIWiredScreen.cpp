@@ -18,6 +18,7 @@
 
 
 #include "WiredScreen.h"
+#include "../FX_starfield.h"
 
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
@@ -719,6 +720,11 @@
 
 
     void WiredScreen::drawAnimatedBackground(int mode, int m1, int m2, int m3, int m4) {
+    	
+    	if ( mode == 1 ) {
+    		drawStarFieldFrame(this);
+    	}
+    	
         // int len = 1; txBuff[0] = 0x61; 
         // serial->write( txBuff, len );
         
