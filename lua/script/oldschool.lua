@@ -20,15 +20,26 @@
 -- Cf called from script dir
 -- dofile("../../routines/FX/starfieldFX.lua")
  -- defines : drawStarFieldFrame
+ 
 -- ==========={ Music Preparing }=======
+print("Let's go !")
+  lcd.rect(0,0,320,240,1,8)
+  
+  snd.stop() 
+  -- snd.setvolume(40)
+  lcd.delay(100)
+  --snd.pause()
+  snd.setvolume(20)
+  lcd.delay(1000) -- need a long pause after setvolume
+  
 -- local music = "./MUSIC/Automation_CD_Menu_186_Music_Atari_ST.mp3"
-local music = "022"
+local music = 22
 
 local rndZik = math.random(2000)/1000
 
 if ( rndZik >= 1) then
   --music = "./MUSIC/MGR_EmpireMenuIntro.mp3"
-  music = "023"
+  music = 23
 end
 
 
@@ -42,8 +53,12 @@ local playMusic = true
 local textStr  = "...Hello : here is my XtreamLua Like PLAYER for >PC >PSP >ANDROID..."
 local textStr2 = "} brought to you by Xtase {"
 
-local textComp = compileBigLetterString( textStr )
-local textComp2 = compileSmallLetterString( textStr2 )
+--local textComp = compileBigLetterString( textStr )
+--local textComp2 = compileSmallLetterString( textStr2 )
+
+SCREEN_WIDTH = 320
+_BIGCHAR_WIDTH_REAL = 16
+_SMALLCHAR_WIDTH_REAL = 8
 
 local textX = SCREEN_WIDTH
 local textX2 = -( textStr2:len() * _SMALLCHAR_WIDTH_REAL )
@@ -51,6 +66,8 @@ local textX2 = -( textStr2:len() * _SMALLCHAR_WIDTH_REAL )
 local screenIter = 0
 
 local yetPlayingMusic = false
+
+white = 1
 
 while true do
 	-- screen:clear(black)
@@ -93,28 +110,22 @@ while true do
  	
  	
  	-- drawStarFieldFrame(screenIter)
+ 	lcd.fx(1)
  	
  	
- 	screen:print(272, 242, "Starfield for PSP by Shine", white)
- 	screen:print(272, 254, "Modififed for YOU by Xtase", white)
+ 	lcd.dispStr( "Starfield for PSP by Shine", 10, 222, white)
+ 	lcd.dispStr( "Modififed for YOU by Xtase", 10, 232, white)
 	
---drawBigLetterString(textStr, textX, 100, function(i)
-drawBigLetterCompiledString(textComp, textX, 100, function(i)
-  if ( i % 2 == 0 ) then return 100 + (math.cos( ( screenIter/2 ) % 360 ) * 3.0)
-  else                   return 100 + (math.cos( ( ( screenIter/2) + 5 ) % 360 ) * 3.0) 
-  end
-end )
+-- --drawBigLetterString(textStr, textX, 100, function(i)
+-- drawBigLetterCompiledString(textComp, textX, 100, function(i)
+--   if ( i % 2 == 0 ) then return 100 + (math.cos( ( screenIter/2 ) % 360 ) * 3.0)
+--   else                   return 100 + (math.cos( ( ( screenIter/2) + 5 ) % 360 ) * 3.0) 
+--   end
+-- end )
 
---[[
---]]
-drawSmallLetterCompiledString(textComp2, textX2, 100, function(i)
-  --[[if ( i % 2 == 0 ) then return SCREEN_HEIGHT - 30 -- + (math.cos( ( screenIter/2 ) % 360 ) * 3.0)
-  else                   return 130 -- + (math.cos( ( ( screenIter/2) + 5 ) % 360 ) * 3.0) 
-  end --]]
-  
-  return SCREEN_HEIGHT - 30
-  
-end )
+-- drawSmallLetterCompiledString(textComp2, textX2, 100, function(i)
+--   return SCREEN_HEIGHT - 30
+-- end )
 
 
 	textX = textX - 5
@@ -128,14 +139,14 @@ end )
 	end
 	
 	
-	screen:waitVblankStart()
-	screen:flip()
+	-- screen:waitVblankStart()
+	-- screen:flip()
 	screenIter = screenIter + 1
 	
-	if Controls.read():start() then break end
-	if Controls.read():triangle() then break end
+	if pad.read().start then break end
+	if pad.read().A then break end
 end
 
-Mp3me.stop()
+snd.stop()
 
-__restart()
+-- __restart()
