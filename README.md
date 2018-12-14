@@ -3,9 +3,15 @@ Cross Platform Gaming System
 
 (work in progress...)
 
-### on GG#2
+### 
 
-**not working**
+The main (& only one built) is an ARM+Arduino Handheld Console System
+
+![The V4 Console](./pictures/face_menu.jpg)
+
+
+
+**not yet working**
 
 - NO Keyb USB mounted
 - will never be able to have RX2/ttyS3 because of SPI/CS
@@ -15,10 +21,15 @@ Cross Platform Gaming System
 - screen
 - LED
 - all btns
-- Wifi (.1.46)
-- USB eth (pins wired)
+- Wifi
+- USB eth
+- Sound
 
-**Ideas**  
+**Layout**
+
+![Whole Layout](./pictures/fullPinout.png)
+
+**Later Ideas**  
 
 - use a 328P 3.3v 8MHz to drive SX1509 (0x3E on I2c) ?
 
