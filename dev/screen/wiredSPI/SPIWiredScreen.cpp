@@ -18,6 +18,7 @@
 
 
 #include "WiredScreen.h"
+#include "../FX_starfield.h"
 
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
@@ -144,6 +145,22 @@
         this->print(str);
         this->print((char*)"\n");
     }
+
+
+	void WiredScreen::dispStr(char* str, int x, int y, uint16_t color) {
+    	if ( str == NULL ) { return; }
+    	int len = strlen( str );
+    	char ch;
+    	for(int i=0; i < len; i++) {
+    		if ( x >= SCREEN_WIDTH ) { break; }
+    		ch = str[i];
+    		if (! ( ch == '\n' ) || ( ch == '\r' ) || ( ch == '\b' ) ) {
+    	    	this->DrawChar( ch , x, y, color);
+    		}
+    		x += 6;
+    	}
+    }
+
 
 	// --------
 	#define SCREEN_MODE_128 0
@@ -516,6 +533,28 @@
             // int g = rand()%32;
             // int r = (31-(y-50)/16)%32;    // A lot of red
             // unsigned short int t = r<<11 | g << 5 | b;
+
+
+            // since 18/09/2018
+            if ( color > 0 && color < 16 ) {
+                     if ( color == 0 ) { color = CLR_BLACK; }
+                else if ( color == 1 ) { color = CLR_WHITE; }
+                else if ( color == 2 ) { color = CLR_LIGHTGRAY; }
+                else if ( color == 3 ) { color = CLR_GRAY; }
+                else if ( color == 4 ) { color = CLR_DARKGRAY; }
+
+                else if ( color == 5 ) { color = CLR_LIGHTGREEN; }
+                else if ( color == 6 ) { color = CLR_GREEN; }
+                else if ( color == 7 ) { color = CLR_DARKGREEN; }
+
+                else if ( color ==  8 ) { color = CLR_PINK; }
+                else if ( color ==  9 ) { color = CLR_CYAN; }
+                else if ( color == 10 ) { color = CLR_RED; }
+                else if ( color == 11 ) { color = CLR_GREEN; }
+                else if ( color == 12 ) { color = CLR_BLUE; }
+                
+            }
+
             unsigned short int t = color;
             *((unsigned short int*)(fbp + location)) = t;
         #endif
@@ -681,6 +720,11 @@
 
 
     void WiredScreen::drawAnimatedBackground(int mode, int m1, int m2, int m3, int m4) {
+    	
+    	if ( mode == 1 ) {
+    		drawStarFieldFrame(this, m1);
+    	}
+    	
         // int len = 1; txBuff[0] = 0x61; 
         // serial->write( txBuff, len );
         

@@ -1,0 +1,10 @@
+Adafruit 2.8" LCD pin   Arietta G25 pin		Signal
+GND             	J4.9           		GND
+Vin             	J4.1             	5V
+CLK             	J4.7             	SPI1-CLK (PA13)
+MISO             	J4.10             	SPI1-MISO (PA11)
+MOSI             	J4.8             	SPI1-MOSI (PA12)
+CS             		J4.25             	SPI1-CS0 (PA8) (also RX2/ttyS3 !!)
+D/C             	J4.31             	PC4
+RST             	J4.33             	PC3
+

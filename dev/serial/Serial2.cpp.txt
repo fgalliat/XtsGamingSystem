@@ -1,0 +1,164 @@
+/*
+* =====================================================================================
+*
+* Filename : serial.cpp
+*
+* Description : open/write to serial port (alpha) 
+*
+* Version : 1.0
+* Created : 06/07/2012 12:22:14
+* Revision : none
+* Compiler : gcc
+*
+* Author : LaurentB
+*
+* =====================================================================================
+*/
+#include <stdlib.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <termios.h>
+
+// #include <pthread.h>
+
+#define LG_BUFFER 1024
+
+using namespace std ;
+
+/*
+* =====================================================================================
+* Class : Serial
+* Description : open/write to serial port
+* =====================================================================================
+*/
+class Serial {
+
+	public :
+
+		Serial(const char *acm = "/dev/ttyACM0", speed_t vitesse = 9600) {
+
+			memset(&tio,0,sizeof(tio)) ;
+			tio.c_iflag=0 ; //IGNPAR ;
+			tio.c_oflag=0 ;
+			tio.c_cflag=CS8|CREAD|CLOCAL ; // 8n1, see termios.h for more information
+			tio.c_lflag=0 ;
+			tio.c_cc[VMIN]=1 ;
+			tio.c_cc[VTIME]=5 ;
+			
+			tty_fd = open( acm, O_RDWR | O_NONBLOCK) ; 
+			if(tty_fd < 0) { 
+				perror("open") ;
+				printf("file => %s\n", acm) ;
+				// exit(EXIT_FAILURE) ;
+			} else {
+				this->setBaud(vitesse) ;
+			}
+		}
+
+		void setBaud(speed_t vitesse) {
+		
+			if (vitesse < 51)	setspeed(B50) ;
+			else if (vitesse < 76)	setspeed(B75) ;
+			else if (vitesse < 111)	setspeed(B110) ;
+			else if (vitesse < 135)	setspeed(B134) ;
+			else if (vitesse < 151)	setspeed(B150) ;
+			else if (vitesse < 201)	setspeed(B200) ;
+			else if (vitesse < 301)	setspeed(B300) ;
+			else if (vitesse < 601)	setspeed(B600) ;
+			else if (vitesse < 1201)	setspeed(B1200) ;
+			else if (vitesse < 1801)	setspeed(B1800) ;
+			else if (vitesse < 2401)	setspeed(B2400) ;
+			else if (vitesse < 4801)	setspeed(B4800) ;
+			else if (vitesse < 9601)	setspeed(B9600) ;
+			else if (vitesse < 19201)	setspeed(B19200) ;
+			else if (vitesse < 34001)	setspeed(B38400) ;
+			else if (vitesse < 57601)	setspeed(B57600) ;
+			else 	setspeed(B115200) ;
+		}
+
+		void putchar(char c) {
+			write(tty_fd,&c,1) ;
+		}
+
+		void putchar(char *c, int n) {
+			write(tty_fd,c,n) ;
+		}
+
+		int readSerial() {
+			// en attendant la nouvelle version
+			nb_read = read(tty_fd, buffer, LG_BUFFER) ;
+			
+			// putputs to stdout
+			write(STDOUT_FILENO, buffer, nb_read) ;
+			return nb_read;
+		}
+
+		void fclose() {
+			if (close(tty_fd)<0) printf("err close serial\n") ;
+			// exit(EXIT_FAILURE) ;
+		}
+
+		unsigned char* getBuff() { return buffer; }
+
+	private :
+
+		void setspeed(speed_t vitesse) {
+			cfsetospeed(&tio, vitesse) ; 
+			cfsetispeed(&tio, vitesse) ;
+			tcsetattr(tty_fd,TCSANOW,&tio) ;
+		}
+
+		int nb_read ;
+		unsigned char buffer[LG_BUFFER] ;
+		struct termios tio ;
+		int tty_fd ;
+};
+  /* ----- end of class Serial ----- */
+
+int main() {
+// 	// exemple d’utilisation
+	
+	Serial arduino("/dev/ttyS2", 9600) ;
+// 	Serial exotic("/dev/ttyACM0") ;
+
+for(int i=0; i < 10000; i++) {
+	
+	if (arduino.getBuff()[4] == '0') {break;}
+	
+	char seq[] = "SRM2";
+	// printf("Sends\n");
+	arduino.putchar(seq,4);
+	
+	// sleep(1);
+	usleep( 50 * 1000 ); // 50ms
+	
+	// printf("Reads\n");
+	int read = arduino.readSerial();
+	// printf("Readed\n");
+	if (read <= 0) printf("Err (%d)\n", read);
+	
+	usleep( 30 * 1000 ); // 50ms
+}
+// 	arduino.putchar(’t’) ;
+// 	arduino.setBaud(15200) ;
+	
+// 	char ma_chaine_c[]="c\0\255\255" ;
+// 	exotic.putchar(ma_chaine_c,4) ;
+	
+// 	sleep(1) ;
+	
+// 	ma_chaine_c[3]= ’\0’ ;
+// 	exotic.putchar(ma_chaine_c,4) ;
+// 	sleep(1) ;
+	
+// 	char another=’r’ ;
+// 	exotic.putchar(another) ;
+	
+// 	exotic.fclose() ;
+	arduino.fclose() ;
+	
+	return 0 ;
+}

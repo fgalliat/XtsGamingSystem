@@ -5,6 +5,12 @@ function halt()
     console.pwr.halt()
 end
 
+function _exit()
+    cls()
+    print("Bye !")
+    console.pwr.exit()
+end
+
 function refreshStatus()
     local connInfos = split( wifi.info(), ':' );
     local wifiConnected = connInfos[1];
@@ -73,25 +79,48 @@ CHOICES = {
     { title="Settings", items={ { lbl="WiFi",      items={  {lbl="UP",   code="console.wifi.up()"}, 
                                                             {lbl="DOWN", code="console.wifi.down()"}, 
                                                             {lbl="SHOW", code="showWifi()"}, 
+                                                            {lbl="RESTART", code="console.wifi.restart()"}, 
                                                             {lbl="+NEW", script="wifiNew.lua"} } },
+                                { lbl="Exit",      code="_exit()" }, 
                                 { lbl="Halt",      code="halt()" },
                                 { lbl="Reboot",    code="console.pwr.reboot()" },
-                                { lbl="Exit",      code="console.pwr.exit()" }, 
                               } 
                             },
 
-    { title="Apps",     items={ { lbl="Console >", items={ {lbl="GB",  exec="../gb/xgb"}, 
+    { title="Apps",     items={ { lbl="Script >",  items={ {lbl="Demo",    script="test.lua"}, 
+                                                           {lbl="Raycast", script="rcmoa.lua"}, 
+                                                           {lbl="Tetris",   script="tetris.lua"}, 
+                                                           {lbl="OutRun",   script="outrun.lua"}, 
+                                                           {lbl="OldSchool",   script="oldschool.lua"}, 
+                                                           {lbl="Sound",   script="sound.lua"} } },
+                                { lbl="Console >", items={ {lbl="GB",  exec="../gb/xgb"}, 
                                                            {lbl="NES", exec="../nes/xnes ../nes/roms/Dr.\\ Mario\\ \\(E\\)\\ \\[\\!\\].nes"} } },
-                                { lbl="Script >",  items={ {lbl="Demo",  script="test.lua"}, 
-                                                           {lbl="Sound", script="sound.lua"} } },
                                 { lbl="Native >",  items={} },
                                 { lbl="Bash",      exec="/bin/bash" } } },
 
-    { title="Zik",      items={ { lbl="Jukebox",   script="jukebox.lua" } } }
+    { title="Zik",      items={ { lbl="Jukebox",   script="sound.lua" } } }
 }
 
 function razScreen()
     lcd.rect(0,0,SCREEN_WIDTH, SCREEN_HEIGHT, 1, 3)
+end
+
+
+function waitAreleased()
+  while (true) do
+    if ( not pad.read().A ) then
+      break;
+    end
+    delay(50);
+  end
+end
+function waitBreleased()
+  while (true) do
+    if ( not pad.read().B ) then
+      break;
+    end
+    delay(50);
+  end
 end
 
 while true do
@@ -140,6 +169,7 @@ while true do
             CHOICE = CHOICE+1
         elseif ( pads.A ) then
             -- GOTO : subLevel
+            waitAreleased()
             break
         end
 
@@ -209,6 +239,8 @@ while true do
                     SUB_CHOICE = SUB_CHOICE + 1
                     break
                 elseif ( pads.A ) then
+                	waitAreleased()
+                
                     local subItem = curParentItem.items[SUB_CHOICE]
 
                     if ( subItem.code ~= nil ) then
@@ -242,6 +274,8 @@ while true do
 
                     break
                 elseif ( pads.B ) then
+                	waitBreleased()
+                	
                     SUB_LEVEL = SUB_LEVEL - 1;
                     if ( SUB_LEVEL < 1 ) then
                         doesReturn = true
@@ -254,9 +288,9 @@ while true do
                     break
                 end
 
-                delay(100)
+                delay(50)
             end
-            delay(100)
+            delay(50)
             if ( doesReturn ) then break; end
         end
     end

@@ -40,7 +40,18 @@ modified by Xtase - fgallliat @Aug2018 for Arietta G25
 #include <errno.h>
 
 
+#include <stdexcept>
+
 //#define DEBUG_SX 1
+
+// ===============================================================
+
+//#define MODE_CMD_LINE 1
+
+#ifndef MODE_CMD_LINE
+	#include "../../i2c/linux/i2c8Bit.h"
+	i2c8Bit i2cDevice( 0x3E, "/dev/i2c-0" );
+#endif
 
 // ===============================================================
 
@@ -89,6 +100,79 @@ int SX1509::read_register(int busfd, __uint16_t reg, unsigned char *buf, int buf
 	return read(busfd, buf, bufsize);
 
 }*/
+
+
+const char* ws = " \t\n\r\f\v";
+
+// trim from end of string (right)
+inline std::string& rtrim(std::string& s, const char* t = ws)
+{
+    s.erase(s.find_last_not_of(t) + 1);
+    return s;
+}
+
+// trim from beginning of string (left)
+inline std::string& ltrim(std::string& s, const char* t = ws)
+{
+    s.erase(0, s.find_first_not_of(t));
+    return s;
+}
+
+// trim from both ends of string (left & right)
+inline std::string& trim(std::string& s, const char* t = ws)
+{
+    return ltrim(rtrim(s, t), t);
+}
+
+std::string _sx_exec(const char* cmd) {
+    char buffer[128];
+    std::string result = "";
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe) throw std::runtime_error("popen() failed!");
+    try {
+        while (!feof(pipe)) {
+            if (fgets(buffer, 128, pipe) != NULL)
+                result += buffer;
+        }
+    } catch (...) {
+        pclose(pipe);
+        throw;
+    }
+    pclose(pipe);
+    return result;
+}
+
+int _sx_readCmdInteger(const char* cmd) {
+        std::string str = _sx_exec( cmd );
+        
+        std::string trimmed = trim(str);
+        
+        std::cout << trimmed << std::endl;
+        
+        // std::string s = "0xfffefffe";
+		unsigned int result = 0x00;
+		
+		try {
+		  result = std::stoul(trimmed, nullptr, 16);
+		} catch(std::invalid_argument &) {
+			printf("Oups reading ! \n");
+			return -1;
+		}
+        
+        /*
+        int len = str.length();
+
+        char * cstr = new char [len+1];
+        strcpy(cstr, str.c_str());
+        
+        int resut = atoi(cstr, );
+        */
+        return (int)result;
+}
+
+
+
+
 int SX1509::read_register(int busfd, uint8_t reg, unsigned char *buf, int bufsize)
 {
 	unsigned char reg_buf[1];
@@ -96,13 +180,53 @@ int SX1509::read_register(int busfd, uint8_t reg, unsigned char *buf, int bufsiz
 
 	reg_buf[0] = reg;
 
+/*
 	ret = write(busfd, reg_buf, 1);
 	if (ret < 0) {
-		printf("Failed to write [0x%02x] (reg: %02x).\n", reg_buf[0], reg);
+		printf("(<) Failed to write [0x%02x] (reg: %02x).\n", reg_buf[0], reg);
 		return ret;
 	}
+*/
 
-	return read(busfd, buf, bufsize);
+
+
+#ifndef MODE_CMD_LINE
+
+	uint8_t res = 0x00;
+	i2cDevice.readReg(reg, res);
+	buf[0] = res;
+
+#else
+	char cmd[128];
+	sprintf( cmd, "i2cget -y 0 0x3E 0x%02x", reg );
+	//printf("< %s\n", cmd);
+	// system(cmd);
+	//	int result = read(busfd, buf, bufsize);
+	int result = _sx_readCmdInteger((const char*)cmd);
+	
+	if (result < 0) {
+		delay(5);
+		result = _sx_readCmdInteger((const char*)cmd);
+		if (result < 0) {
+			printf("SX WTF \n");
+			result = 255;
+		}
+	}
+	
+	// BEWARE
+	buf[0] = (uint8_t)result;
+	
+	if ( reg == REG_DATA_A ) {
+	  //printf("> %d > %d\n", reg, result);
+	  printf("DATA_A : ");
+	  writeBin( result );
+	}
+#endif
+
+	delay(15);
+
+//	return result;
+	return 1;
 }
 
 // dirty HACK
@@ -119,17 +243,53 @@ void SX1509::i2c_writeReg(uint8_t reg, uint8_t val) {
 	unsigned char reg_buf[2];
 	int ret;
 
-	reg_buf[0] = reg & 0xFF;
-	reg_buf[1] = val & 0xFF;
+	reg_buf[0] = reg; // & 0xFF;
+	reg_buf[1] = val; // & 0xFF;
 
+/*
 	ret = write(busfd, reg_buf, 2);
 	if (ret < 0) {
-		printf("Failed to write [0x%02x 0x%02x] (reg: %04x).\n", reg_buf[0], reg_buf[1], reg);
+		printf("(>) Failed to write [0x%02x 0x%02x] (reg: %04x).\n", reg_buf[0], reg_buf[1], reg);
 		return;
 	} 
+*/
+
+#ifndef MODE_CMD_LINE
+
+	i2cDevice.writeReg(reg, val);
+
+#else
+	char cmd[128];
+	sprintf( cmd, "i2cset -y 0 0x3E 0x%02x 0x%02x", reg, val );
+	// printf("- %s\n", cmd);
+	 system(cmd);
+	//	int result = read(busfd, buf, bufsize);
+	//int result = (int)_sx_readCmdInteger((const char*)cmd);
+	//printf("> %d\n", result);
+#endif
+
 
 	delay(15);
 }
+
+
+uint8_t SX1509::readBankA() {
+//	uint8_t RegDir = i2c_readReg(REG_DIR_A);
+		
+		//if (RegDir & (1<<pin))	// If the pin is an input
+		//{
+			uint8_t RegData = i2c_readReg(REG_DATA_A);
+//			if (RegData & (1<<pin))
+//				return 1;
+		//}
+		
+		
+		
+return RegData;		
+}
+
+
+
 
 
 /*
@@ -163,7 +323,8 @@ void SX1509::i2c_writeReg(int reg, uint8_t val) {
 
 uint8_t SX1509::i2c_readReg(uint8_t reg) {
 	
-	if ( reg == REG_DIR_A ) {
+	// dirty little Hack
+	if ( reg == REG_DIR_A && regDirASave != 0x00 ) {
 		return regDirASave;
 	}
 	
@@ -347,9 +508,11 @@ uint8_t SX1509::init2(uint8_t address, uint8_t bus)
 	i2c_writeReg(REG_CLOCK, 64);
 	//Set Oscillator frequency (fOSC) source to Internal 2MHz oscillator
 
-	if (i2c_readReg(REG_INTERRUPT_MASK_A) != ALL)
+	uint8_t initOK = (uint8_t)i2c_readReg(REG_INTERRUPT_MASK_A);
+
+	if ( initOK != ALL)
 	{
-		fprintf(stderr, "FAILED to initialize SX1509! \n");
+		fprintf(stderr, "FAILED to initialize SX1509 (%d Vs %d)! \n", initOK, ALL);
 		return 0;
 	}
 	else {
@@ -405,7 +568,7 @@ byte SX1509::init(const char* device)
 		device = "/dev/i2c-0";
 	}
 	
-		
+/* == TEMP using cmdline i2cget ..... 
 	wiringPiFd = open(device, O_RDWR);
 
 	if (wiringPiFd < 0) {
@@ -418,6 +581,8 @@ byte SX1509::init(const char* device)
 		printf("ioctl error: %s\n", device);
 		return 1;
 	}	
+
+*/
 
 return init2(1,1);
 }

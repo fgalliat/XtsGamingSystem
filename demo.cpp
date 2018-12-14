@@ -62,9 +62,9 @@ int main(int argc, char const *argv[]) {
 	}
 
     //int vol = snd.getVolume();
-    //snd.volume(50); // 50%
+    // snd.volume(50); // 50%
     
-    console.playMp3(22);
+    // console.playMp3(22);
 
 	console.cls();
 	console.getScreen()->drawBPP( "/BLAST.BPP", 0, 0 );

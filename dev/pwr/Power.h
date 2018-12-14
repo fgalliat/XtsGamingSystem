@@ -9,6 +9,11 @@
  **/
 
 #include <sys/stat.h> // for mkdir
+#include <stdio.h>
+#include <cstdlib>
+#include <pthread.h>
+
+extern void delay(int time);
 
   class Power {
      private:
@@ -23,7 +28,9 @@
        void createLogDir() {
           // S_IRWXU => chmod 7
           // S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH => 775
+          // printf("I try to create batt dir\n");
           const int dir_err = mkdir("/vm_mnt/log", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+          // printf("I created batt dir\n");
         //   if (-1 == dir_err) {
         //     printf("Error creating LOG directory! \n");
         //     exit(1);
@@ -32,6 +39,7 @@
 
        void writeBattTimerFile(int value) {
             createLogDir();
+            // printf("I try to write batt file\n");
             FILE *f = fopen(BATT_LOG_FILE, "w");
             if (f == NULL) {
                 printf("(!!) Error opening BATTERY-LOG file!\n");
@@ -42,11 +50,13 @@
             fprintf(f, "%d", value);
 
             fclose(f);
+            // printf("I wrote batt file\n");
        }
 
 
        int readBattTimerFile() {
            createLogDir();
+           // printf("I try to read batt file\n");
             char num[16];
             int numCpt = 0;
 
@@ -55,19 +65,23 @@
                 _time = 0; // BEWARE w/ risk of an infinite loop
                 return _time;
             }
-
+			// printf("I try to loop batt file\n");
             while(true) {
                 char ch = fgetc(f);
-                if ( ch == EOF || ch == '\n' ) {
+                
+                // printf("I read %d\n", ch);
+                
+                if ( ch == EOF || ch == 0xFF || ch == '\n' ) {
                     break;
                 }
                 num[numCpt++] = ch;
             }
             num[numCpt++] = 0x00;
 
+			// printf("I try to atoi batt file %s\n", num);
             fclose(f);
-
            _time = atoi(num);
+           // printf("I read batt file %d\n", _time);
            return _time;
        }
 
@@ -126,7 +140,7 @@
 
        // battery discharging time in min. (5min accurate)
        int getTime() {
-           if ( time < 0 ) {
+           if ( _time < 0 ) {
                readBattTimerFile();
            }
            return _time * ACCURACY;

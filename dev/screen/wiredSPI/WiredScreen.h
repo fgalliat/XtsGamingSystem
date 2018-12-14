@@ -1,7 +1,11 @@
 #ifndef __BRIDGED_SCREEN_H_
 #define __BRIDGED_SCREEN_H_ 1
 
+#include <stdint.h>
+
 #define rgb16(r,g,b) { (uint16_t)( (( r *31/255 )<<11) | (( g *63/255 )<<5) | ( b *31/255 ) ) }
+
+#define CLR_CYAN  rgb16(0,255,255)
 
 #define CLR_PINK  rgb16(255,0,150)
 #define CLR_RED   rgb16(255,0,0)
@@ -9,6 +13,16 @@
 #define CLR_BLUE  rgb16(0,0,255)
 #define CLR_BLACK 0
 #define CLR_WHITE rgb16(255,255,255)
+
+#define CLR_LIGHTGRAY rgb16(200,200,200)
+#define CLR_GRAY      rgb16(128,128,128)
+#define CLR_DARKGRAY  rgb16(50,50,50)
+
+#define CLR_LIGHTGREEN rgb16(150,255,150)
+#define CLR_DARKGREEN  rgb16(0,150,0)
+
+
+
 //#define CLR_WHITE 0xFFFF
 
 #define SCREEN_WIDTH 320
@@ -67,6 +81,7 @@
         void print(float val);
         void print(char* str);
         void println(char* str);
+        void dispStr(char* str, int x, int y, uint16_t color=CLR_WHITE);
 
         void drawBPP(char* name, int x, int y);
         void drawPCT(char* name, int x, int y);
