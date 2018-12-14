@@ -9,6 +9,11 @@
 #include "gui.hpp"
 #include "config.hpp"
 
+#ifdef XTSCONSOLE
+ #include "../XtsConsole.h"
+ extern XtsConsole console;
+#endif
+
 namespace GUI {
 
 // Screen size:
@@ -48,7 +53,10 @@ void set_size(int mul)
 void init()
 {
     // Initialize graphics system:
+    #ifndef XTSCONSOLE
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK);
+    #endif
+
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     TTF_Init();
 
@@ -286,6 +294,7 @@ void run()
     {
         frameStart = SDL_GetTicks();
 
+#ifndef XTSCONSOLE
         // Handle events:
         while (SDL_PollEvent(&e))
             switch (e.type)
@@ -297,6 +306,22 @@ void run()
                     else if (pause)
                         menu->update(keys);
             }
+#else
+//   printf("poll console \n");
+console.delay(30); // TMP slow down keypad
+  Pad* pad = console.readPad();
+//   printf("polled console \n");
+  if (pad == NULL) printf("null pad \n");
+  u8 _keys[128];
+  _keys[SDL_SCANCODE_RETURN] = pad->start();
+  _keys[SDL_SCANCODE_DOWN] = pad->down();
+  _keys[SDL_SCANCODE_UP] = pad->up();
+  _keys[SDL_SCANCODE_LEFT] = pad->left();
+  _keys[SDL_SCANCODE_RIGHT] = pad->right();
+  if ( pause ) {
+      menu->update(_keys);
+  }
+#endif
 
         if (not pause) CPU::run_frame();
         render();
