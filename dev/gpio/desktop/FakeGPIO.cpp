@@ -14,6 +14,10 @@ void _s_close() {
     endwin();
     */
 }
+// compatibility w/ ARM code (SX1509 over Arduino) TODO : refactor
+char* SX1509::readAllPins() { return (char*)"1111111011100000"; }
+bool SX1509::isMP3Playing(char* banks) { return false; } // TODO : better
+
 
 SX1509::SX1509() {}
 /*

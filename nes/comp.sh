@@ -5,8 +5,14 @@ MODE="DESKTOP"
 
 # Oui pour emulation de la console !!!
 MODE="XTSCONSOLE"
-#. ../desktop.arch
-. ../arietta.arch
+if [ "$1" = "arm" ]     
+then                    
+ # Arietta version      
+ . ../arietta.arch      
+else                    
+ # Desktop version      
+ . ../desktop.arch      
+fi                      
 
 DEPS="$CPPs"
 

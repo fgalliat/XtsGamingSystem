@@ -109,6 +109,11 @@ public:
 // -----------------------------------------------------------------------------
 	SX1509();
 
+// -= custom methods =-
+char* readAllPins();
+bool isMP3Playing(char* banks);
+// -= custom methods =-
+
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 uint8_t init2(uint8_t address, uint8_t bus);
