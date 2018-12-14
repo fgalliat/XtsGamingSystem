@@ -1,8 +1,8 @@
 clear
  mkdir build 2>/dev/null
 
-MODE="DESKTOP"
-#MODE="XTSCONSOLE"
+#MODE="DESKTOP"
+MODE="XTSCONSOLE"
 
 #FLAGS="-O3 -march=native -std=c++14 -Wno-unused-value"
 #CPP="clang++"
