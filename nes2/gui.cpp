@@ -52,20 +52,25 @@ void set_size(int mul)
 /* Initialize GUI */
 void init()
 {
+printf("GUI::init 1\n");
     // Initialize graphics system:
     #ifndef XTSCONSOLE
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK);
-    #endif
-
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    #endif
+printf("GUI::init 2\n");
+
     TTF_Init();
+printf("GUI::init 3\n");
 
     for (int i = 0; i < SDL_NumJoysticks(); i++)
         joystick[i] = SDL_JoystickOpen(i);
+printf("GUI::init 4\n");
 
     APU::init();
     soundQueue = new Sound_Queue;
     soundQueue->init(96000);
+printf("GUI::init (5)\n");
 
     // Initialize graphics structures:
     window      = SDL_CreateWindow  ("LaiNES",
@@ -80,15 +85,18 @@ void init()
                                      SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
                                      WIDTH, HEIGHT);
 
+printf("GUI::init (6)\n");
     font = TTF_OpenFont("res/font.ttf", FONT_SZ);
     keys = SDL_GetKeyboardState(0);
 
+printf("GUI::init (7)\n");
     // Initial background:
     SDL_Surface* backSurface  = IMG_Load("res/init.png");
     background = SDL_CreateTextureFromSurface(renderer, backSurface);
     SDL_SetTextureColorMod(background, 60, 60, 60);
     SDL_FreeSurface(backSurface);
 
+printf("GUI::init (8)\n");
     // Menus:
     mainMenu = new Menu;
     mainMenu->add(new Entry("Load ROM", []{ menu = fileMenu; }));
@@ -310,7 +318,7 @@ void run()
                         menu->update(keys);
             }
 #else
-//   printf("poll console \n");
+   printf("poll console \n");
 // console.delay(30); // TMP slow down keypad
   Pad* pad = console.readPad();
 //   printf("polled console \n");
