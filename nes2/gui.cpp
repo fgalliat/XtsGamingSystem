@@ -197,6 +197,9 @@ u8 get_joypad_state(int n)
     }
     else
     {
+
+printf( "read Joypad #%d\n", n );
+
         j |= (keys[KEY_A[n]])      << 0;
         j |= (keys[KEY_B[n]])      << 1;
         j |= (keys[KEY_SELECT[n]]) << 2;
