@@ -69,6 +69,14 @@ bool Pad::bt1() { return this->_bt1; }
 bool Pad::bt2() { return this->_bt2; }
 bool Pad::start() { return this->_btStart; }
 
+bool Pad::atLeastOne() {
+	return this->left() || this->right() || this->up() || this->down() || this->bt1() || this->bt2() || this->start();
+}
+
+bool Pad::hasChanged() {
+	return this->_hasChanged;
+}
+
 // #define PAD_TIME_CHECK 1
 
 #ifdef PAD_TIME_CHECK
@@ -102,7 +110,11 @@ bool Pad::checkBtns()
 		return false;
 	}
 
+this->_hasChanged = false;
+
 #ifdef NEW_SERIAL_GPIO
+
+// printf("NEW_SERIAL_GPIO\n");
 
 	// if ( xts_lastBanksTime <= 0 ) {
 	// 	xts_lastBanksTime = __g_now();
@@ -114,42 +126,98 @@ bool Pad::checkBtns()
 		return false;
 	}
 
-	this->_btStart = gpio.isAButtonPressed(banks, BTN0_PIN);
-	this->_bt1 = gpio.isAButtonPressed(banks, BTN1_PIN);
-	this->_bt2 = gpio.isAButtonPressed(banks, BTN2_PIN);
+	bool __btStart = gpio.isAButtonPressed(banks, BTN0_PIN);
+	bool __bt1 = gpio.isAButtonPressed(banks, BTN1_PIN);
+	bool __bt2 = gpio.isAButtonPressed(banks, BTN2_PIN);
+	bool __up = gpio.isAButtonPressed(banks, DIR_UP_PIN);
+	bool __left = gpio.isAButtonPressed(banks, DIR_LEFT_PIN);
+	bool __right = gpio.isAButtonPressed(banks, DIR_RIGHT_PIN);
+	bool __down = gpio.isAButtonPressed(banks, DIR_DOWN_PIN);
 
-	this->_up = gpio.isAButtonPressed(banks, DIR_UP_PIN);
-	this->_left = gpio.isAButtonPressed(banks, DIR_LEFT_PIN);
-	this->_right = gpio.isAButtonPressed(banks, DIR_RIGHT_PIN);
-	this->_down = gpio.isAButtonPressed(banks, DIR_DOWN_PIN);
+	if ( __btStart != this->_btStart || //
+		 __bt1 != this->_bt1 || //
+		 __bt2 != this->_bt2 || //
+		 __up != this->_up || //
+		 __down != this->_down || //
+	 	 __left != this->_left || //
+		 __right != this->_right  ) {
+		this->_hasChanged = true;
+	}
+
+	this->_btStart = __btStart;
+	this->_bt1 = __bt1;
+	this->_bt2 = __bt2;
+	this->_up = __up;
+	this->_left = __left;
+	this->_right = __right;
+	this->_down = __down;
 	
 	__ext_mp3PlayingValue = gpio.isMP3Playing(banks);
 	xts_lastBanksTime = __g_now();
 
 #else
 #ifdef XTSCONSOLE
-
+// printf("XTSCONSOLE\n");
 	uint8_t bankA = gpio.readBankA();
 
-	this->_btStart = (bankA & (1 << BTN0_PIN)) == LOW;
-	this->_bt1 = (bankA & (1 << BTN1_PIN)) == LOW;
-	this->_bt2 = (bankA & (1 << BTN2_PIN)) == LOW;
+	bool __btStart = (bankA & (1 << BTN0_PIN)) == LOW;
+	bool __bt1 = (bankA & (1 << BTN1_PIN)) == LOW;
+	bool __bt2 = (bankA & (1 << BTN2_PIN)) == LOW;
 
-	this->_up = (bankA & (1 << DIR_UP_PIN)) == LOW;
-	this->_left = (bankA & (1 << DIR_LEFT_PIN)) == LOW;
-	this->_right = (bankA & (1 << DIR_RIGHT_PIN)) == LOW;
-	this->_down = (bankA & (1 << DIR_DOWN_PIN)) == LOW;
+	bool __up = (bankA & (1 << DIR_UP_PIN)) == LOW;
+	bool __left = (bankA & (1 << DIR_LEFT_PIN)) == LOW;
+	bool __right = (bankA & (1 << DIR_RIGHT_PIN)) == LOW;
+	bool __down = (bankA & (1 << DIR_DOWN_PIN)) == LOW;
+
+
+	if ( __btStart != this->_btStart || //
+		 __bt1 != this->_bt1 || //
+		 __bt2 != this->_bt2 || //
+		 __up != this->_up || //
+		 __down != this->_down || //
+	 	 __left != this->_left || //
+		 __right != this->_right  ) {
+		this->_hasChanged = true;
+	}
+
+	this->_btStart = __btStart;
+	this->_bt1 = __bt1;
+	this->_bt2 = __bt2;
+	this->_up = __up;
+	this->_left = __left;
+	this->_right = __right;
+	this->_down = __down;
+
+
 
 #else
+// printf("DESKTOP\n");
+	bool __btStart = gpio.digitalRead(BTN0_PIN) == LOW;
+	bool __bt1 = gpio.digitalRead(BTN1_PIN) == LOW;
+	bool __bt2 = gpio.digitalRead(BTN2_PIN) == LOW;
 
-	this->_btStart = gpio.digitalRead(BTN0_PIN) == LOW;
-	this->_bt1 = gpio.digitalRead(BTN1_PIN) == LOW;
-	this->_bt2 = gpio.digitalRead(BTN2_PIN) == LOW;
+	bool __up = gpio.digitalRead(DIR_UP_PIN) == LOW;
+	bool __left = gpio.digitalRead(DIR_LEFT_PIN) == LOW;
+	bool __right = gpio.digitalRead(DIR_RIGHT_PIN) == LOW;
+	bool __down = gpio.digitalRead(DIR_DOWN_PIN) == LOW;
 
-	this->_up = gpio.digitalRead(DIR_UP_PIN) == LOW;
-	this->_left = gpio.digitalRead(DIR_LEFT_PIN) == LOW;
-	this->_right = gpio.digitalRead(DIR_RIGHT_PIN) == LOW;
-	this->_down = gpio.digitalRead(DIR_DOWN_PIN) == LOW;
+	if ( __btStart != this->_btStart || //
+		 __bt1 != this->_bt1 || //
+		 __bt2 != this->_bt2 || //
+		 __up != this->_up || //
+		 __down != this->_down || //
+	 	 __left != this->_left || //
+		 __right != this->_right  ) {
+		this->_hasChanged = true;
+	}
+
+	this->_btStart = __btStart;
+	this->_bt1 = __bt1;
+	this->_bt2 = __bt2;
+	this->_up = __up;
+	this->_left = __left;
+	this->_right = __right;
+	this->_down = __down;
 
 #endif
 #endif

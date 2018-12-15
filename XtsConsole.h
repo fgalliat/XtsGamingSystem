@@ -26,7 +26,7 @@
     bool _bt1 = false;
     bool _bt2 = false;
     bool _btStart = false;
-    
+    bool _hasChanged = false;
   public:
     Pad() {}
     ~Pad() {}
@@ -41,6 +41,9 @@
     bool start();
     
     bool checkBtns();
+
+    bool hasChanged();
+    bool atLeastOne();
 };
 
 // ========================================================
