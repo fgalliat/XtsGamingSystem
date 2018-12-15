@@ -308,7 +308,7 @@ void run()
             }
 #else
 //   printf("poll console \n");
-console.delay(30); // TMP slow down keypad
+// console.delay(30); // TMP slow down keypad
   Pad* pad = console.readPad();
 //   printf("polled console \n");
   if (pad == NULL) printf("null pad \n");
@@ -318,9 +318,13 @@ console.delay(30); // TMP slow down keypad
   _keys[SDL_SCANCODE_UP] = pad->up();
   _keys[SDL_SCANCODE_LEFT] = pad->left();
   _keys[SDL_SCANCODE_RIGHT] = pad->right();
-  if ( pause ) {
-      menu->update(_keys);
+//   if ( pad->hasChanged() && pause ) {
+  if ( pad->atLeastOne() && pause ) {
+      if ( pad->hasChanged() ) {
+        menu->update(_keys);
+      }
   }
+  console.delay(5); // TMP slow down process
 #endif
 
         if (not pause) CPU::run_frame();
