@@ -12,6 +12,7 @@
 #ifdef XTSCONSOLE
  #include "../XtsConsole.h"
  extern XtsConsole console;
+ extern Pad* pad;
 #endif
 
 namespace GUI {
@@ -76,11 +77,12 @@ printf("GUI::init (5)\n");
     window      = SDL_CreateWindow  ("LaiNES",
                                      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                      WIDTH * last_window_size, HEIGHT * last_window_size, 0);
-
+printf("GUI::init (5.1)\n");
     renderer    = SDL_CreateRenderer(window, -1,
                                      SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+printf("GUI::init (5.2)\n");
     SDL_RenderSetLogicalSize(renderer, WIDTH, HEIGHT);
-
+printf("GUI::init (5.3)\n");
     gameTexture = SDL_CreateTexture (renderer,
                                      SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
                                      WIDTH, HEIGHT);
@@ -187,6 +189,24 @@ u8 get_joypad_state(int n)
     const int DEAD_ZONE = 8000;
 
     u8 j = 0;
+
+// printf( "read Joypad #%d\n", n );
+
+#ifdef XTSCONSOLE
+
+if (pad == NULL) { return 0; }
+if (n == 1) { return 0; }
+    // polled inside run()
+        j |= (pad->bt1())      << 0; // A
+        j |= (pad->bt2())      << 1; // B
+        j |= (keys[KEY_SELECT[n]]) << 2;
+        j |= (pad->start())  << 3;
+        j |= (pad->up())     << 4;
+        j |= (pad->down())   << 5;
+        j |= (pad->left())   << 6;
+        j |= (pad->right())  << 7;
+
+#else
     if (useJoystick[n])
     {
         j |= (SDL_JoystickGetButton(joystick[n], BTN_A[n]))      << 0;  // A.
@@ -205,9 +225,6 @@ u8 get_joypad_state(int n)
     }
     else
     {
-
-printf( "read Joypad #%d\n", n );
-
         j |= (keys[KEY_A[n]])      << 0;
         j |= (keys[KEY_B[n]])      << 1;
         j |= (keys[KEY_SELECT[n]]) << 2;
@@ -217,6 +234,8 @@ printf( "read Joypad #%d\n", n );
         j |= (keys[KEY_LEFT[n]])   << 6;
         j |= (keys[KEY_RIGHT[n]])  << 7;
     }
+#endif
+
     return j;
 }
 
@@ -318,9 +337,9 @@ void run()
                         menu->update(keys);
             }
 #else
-   printf("poll console \n");
+//    printf("poll console \n"); // it always do...
 // console.delay(30); // TMP slow down keypad
-  Pad* pad = console.readPad();
+  pad = console.readPad();
 //   printf("polled console \n");
   if (pad == NULL) printf("null pad \n");
   u8 _keys[128];
