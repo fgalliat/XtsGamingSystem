@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
           if ( ! console.init() ) {
               return -1;
           }
+          console.delay(500);
         //   return 1;
         #endif
 

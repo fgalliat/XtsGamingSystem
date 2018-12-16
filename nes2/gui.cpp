@@ -194,8 +194,9 @@ u8 get_joypad_state(int n)
 
 #ifdef XTSCONSOLE
 
-if (pad == NULL) { return 0; }
-if (n == 1) { return 0; }
+    if (pad == NULL) { return 0; }
+    if (n == 1) { return 0; } // 2nd joypad
+
     // polled inside run()
         j |= (pad->bt1())      << 0; // A
         j |= (pad->bt2())      << 1; // B
