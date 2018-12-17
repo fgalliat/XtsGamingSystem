@@ -227,6 +227,9 @@ void load_sprites()
 }
 
 /* Process a pixel, draw it if it's on screen */
+
+bool dirtyPix = false;
+
 void pixel()
 {
     u8 palette = 0, objPalette = 0;
@@ -266,6 +269,7 @@ void pixel()
         if (objPalette && (palette == 0 || objPriority == 0)) palette = objPalette;
 
         pixels[scanline*256 + x] = nesRgb[rd(0x3F00 + (rendering() ? palette : 0))];
+        dirtyPix = true;
     }
     // Perform background shifts:
     bgShiftL <<= 1; bgShiftH <<= 1;
@@ -279,7 +283,12 @@ template<Scanline s> void scanline_cycle()
     static u16 addr;
 
     if (s == NMI and dot == 1) { status.vBlank = true; if (ctrl.nmi) CPU::set_nmi(); }
-    else if (s == POST and dot == 0) GUI::new_frame(pixels);
+    else if (s == POST and dot == 0) {
+    	if ( dirtyPix ) {
+    		GUI::new_frame(pixels);
+    	}
+    	dirtyPix = false;
+    }
     else if (s == VISIBLE or s == PRE)
     {
         // Sprites:
