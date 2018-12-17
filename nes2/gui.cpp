@@ -1,6 +1,8 @@
 #include <csignal>
+#ifndef XTSCONSOLE
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#endif
 #include "Sound_Queue.h"
 #include "apu.hpp"
 #include "cartridge.hpp"
@@ -21,15 +23,17 @@ namespace GUI {
 const unsigned WIDTH  = 256;
 const unsigned HEIGHT = 240;
 
+#ifndef XTSCONSOLE
 // SDL structures:
 SDL_Window* window;
 SDL_Renderer* renderer;
 SDL_Texture* gameTexture;
 SDL_Texture* background;
+SDL_Joystick* joystick[] = { nullptr, nullptr };
 TTF_Font* font;
+#endif
 u8 const* keys;
 Sound_Queue* soundQueue;
-SDL_Joystick* joystick[] = { nullptr, nullptr };
 
 // Menus:
 Menu* menu;
@@ -46,8 +50,10 @@ bool pause = true;
 void set_size(int mul)
 {
     last_window_size = mul;
+    #ifndef XTSCONSOLE
     SDL_SetWindowSize(window, WIDTH * mul, HEIGHT * mul);
     SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    #endif
 }
 
 /* Initialize GUI */
@@ -58,14 +64,12 @@ printf("GUI::init 1\n");
     #ifndef XTSCONSOLE
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-    #endif
-printf("GUI::init 2\n");
-
     TTF_Init();
-printf("GUI::init 3\n");
 
     for (int i = 0; i < SDL_NumJoysticks(); i++)
         joystick[i] = SDL_JoystickOpen(i);
+    #endif
+
 printf("GUI::init 4\n");
 
     APU::init();
@@ -73,6 +77,7 @@ printf("GUI::init 4\n");
     soundQueue->init(96000);
 printf("GUI::init (5)\n");
 
+#ifndef XTSCONSOLE
     // Initialize graphics structures:
     window      = SDL_CreateWindow  ("LaiNES",
                                      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -98,6 +103,7 @@ printf("GUI::init (7)\n");
     SDL_SetTextureColorMod(background, 60, 60, 60);
     SDL_FreeSurface(backSurface);
 
+#endif
 printf("GUI::init (8)\n");
     // Menus:
     mainMenu = new Menu;
@@ -123,6 +129,7 @@ printf("GUI::init (8)\n");
     {
         keyboardMenu[i] = new Menu;
         keyboardMenu[i]->add(new Entry("<", []{ menu = settingsMenu; }));
+        #ifndef XTSCONSOLE
         if (joystick[i] != nullptr)
             keyboardMenu[i]->add(new Entry("Joystick >", [=]{ menu = joystickMenu[i]; useJoystick[i] = true; }));
         keyboardMenu[i]->add(new ControlEntry("Up",     &KEY_UP[i]));
@@ -148,6 +155,7 @@ printf("GUI::init (8)\n");
             joystickMenu[i]->add(new ControlEntry("Start",  &BTN_START[i]));
             joystickMenu[i]->add(new ControlEntry("Select", &BTN_SELECT[i]));
         }
+        #endif
     }
 
     fileMenu = new FileMenu;
@@ -155,6 +163,7 @@ printf("GUI::init (8)\n");
     menu = mainMenu;
 }
 
+#ifndef XTSCONSOLE
 /* Render a texture on screen */
 void render_texture(SDL_Texture* texture, int x, int y)
 {
@@ -182,6 +191,7 @@ SDL_Texture* gen_text(std::string text, SDL_Color color)
     SDL_FreeSurface(surface);
     return texture;
 }
+#endif
 
 /* Get the joypad state from SDL */
 u8 get_joypad_state(int n)
@@ -263,6 +273,7 @@ void new_samples(const blip_sample_t* samples, size_t count)
 }
 
 /* Render the screen */
+#ifndef XTSCONSOLE
 void render()
 {
     SDL_RenderClear(renderer);
@@ -278,20 +289,33 @@ void render()
 
     SDL_RenderPresent(renderer);
 }
+#else
+void render() {
+    // Draw the menu:
+    if (pause) menu->render();  
+}
+#endif
 
 /* Play/stop the game */
 void toggle_pause()
 {
     pause = not pause;
     menu  = mainMenu;
-
+#ifndef XTSCONSOLE
     if (pause)
         SDL_SetTextureColorMod(gameTexture,  60,  60,  60);
     else
         SDL_SetTextureColorMod(gameTexture, 255, 255, 255);
+#else
+if (pause) {
+console.getScreen()->cls();
+console.getScreen()->dispStr("PAUSE", 60, 60, 1);
+}
+#endif
 }
 
 /* Prompt for a key, return the scancode */
+#ifndef XTSCONSOLE
 SDL_Scancode query_key()
 {
     SDL_Texture* prompt = gen_text("Press a key...", { 255, 255, 255 });
@@ -321,11 +345,14 @@ int query_button()
             return e.jbutton.button;
     }
 }
+#endif
 
 /* Run the emulator */
 void run()
 {
+    #ifndef XTSCONSOLE
     SDL_Event e;
+    #endif
 
     // Framerate control:
     u32 frameStart, frameTime;
@@ -366,7 +393,7 @@ void run()
         menu->update(_keys);
       }
   }
-  console.delay(5); // TMP slow down process
+  
 #endif
 
         if (not pause) CPU::run_frame();
@@ -374,8 +401,13 @@ void run()
 
         // Wait to mantain framerate:
         frameTime = SDL_GetTicks() - frameStart;
-        if (frameTime < DELAY)
+        if (frameTime < DELAY) {
+            #ifndef XTSCONSOLE
             SDL_Delay((int)(DELAY - frameTime));
+            #else
+            console.delay( (int)(DELAY - frameTime) );
+            #endif
+        }
     }
 }
 

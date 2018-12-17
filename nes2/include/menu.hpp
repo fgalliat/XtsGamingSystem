@@ -56,6 +56,7 @@ class Menu
     int cursor = 0;
 
   public:
+    Menu();
     void add(Entry* entry);
     void clear();
     void update(u8 const* keys);
