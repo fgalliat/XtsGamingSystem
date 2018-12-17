@@ -216,6 +216,41 @@ static int lcd_sprite (lua_State *L) {
 	return 1;
 }
 
+static int lcd_sload (lua_State *L) {
+	const char *str = luaL_optstring(L, 1, NULL);
+	int      sltNum = (int)luaL_optinteger(L, 2, EXIT_SUCCESS);
+
+    console.getScreen()->loadPCTSlot(sltNum, (char*)str);
+
+	return 1;
+}
+
+static int lcd_sback (lua_State *L) {
+	int      sltNum = (int)luaL_optinteger(L, 1, EXIT_SUCCESS);
+	int           x = (int)luaL_optinteger(L, 2, EXIT_SUCCESS);
+	int           y = (int)luaL_optinteger(L, 3, EXIT_SUCCESS);
+	
+	console.getScreen()->drawSlotBack( sltNum, x, y);
+	return 1;
+}
+
+static int lcd_ssprite (lua_State *L) {
+	int      sltNum = (int)luaL_optinteger(L, 1, EXIT_SUCCESS);
+	int           x = (int)luaL_optinteger(L, 2, EXIT_SUCCESS);
+	int           y = (int)luaL_optinteger(L, 3, EXIT_SUCCESS);
+	
+	int           w = (int)luaL_optinteger(L, 4, EXIT_SUCCESS);
+	int           h = (int)luaL_optinteger(L, 5, EXIT_SUCCESS);
+	
+	int          sx = (int)luaL_optinteger(L, 6, EXIT_SUCCESS);
+	int          sy = (int)luaL_optinteger(L, 7, EXIT_SUCCESS);
+	
+	// TODO : transparent color
+
+	console.getScreen()->drawSlotSprite( sltNum, x, y, w, h, sx, sy );
+	return 1;
+}
+
 // -= Backgrounds =-
 static int _lcd_fx_array(lua_State *L, int bckMode, int arrayShiftIndex);
 
@@ -338,6 +373,10 @@ static const luaL_Reg xtslcdlib[] = {
   {"bpp",     lcd_bpp},
   {"pct",     lcd_pct},
   {"sprite",  lcd_sprite},
+
+  {"sload",  lcd_sload},
+  {"sback",  lcd_sback},
+  {"ssprite",  lcd_ssprite},
   
   {"fx",  lcd_fx},
   
