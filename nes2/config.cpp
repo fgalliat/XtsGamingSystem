@@ -12,6 +12,7 @@ CSimpleIniA ini(true, false, false);
 int last_window_size = 1;
 
 /* Controls settings */
+#ifndef XTSCONSOLE
 SDL_Scancode KEY_A     [] = { SDL_SCANCODE_A,      SDL_SCANCODE_ESCAPE };
 SDL_Scancode KEY_B     [] = { SDL_SCANCODE_S,      SDL_SCANCODE_ESCAPE };
 SDL_Scancode KEY_SELECT[] = { SDL_SCANCODE_SPACE,  SDL_SCANCODE_ESCAPE };
@@ -20,6 +21,7 @@ SDL_Scancode KEY_UP    [] = { SDL_SCANCODE_UP,     SDL_SCANCODE_ESCAPE };
 SDL_Scancode KEY_DOWN  [] = { SDL_SCANCODE_DOWN,   SDL_SCANCODE_ESCAPE };
 SDL_Scancode KEY_LEFT  [] = { SDL_SCANCODE_LEFT,   SDL_SCANCODE_ESCAPE };
 SDL_Scancode KEY_RIGHT [] = { SDL_SCANCODE_RIGHT,  SDL_SCANCODE_ESCAPE };
+#endif
 int BTN_UP    [] = { -1, -1 };
 int BTN_DOWN  [] = { -1, -1 };
 int BTN_LEFT  [] = { -1, -1 };
@@ -103,6 +105,7 @@ void load_settings()
             BTN_SELECT[p] = atoi(ini.GetValue(section, "SELECT", "-1"));
             BTN_START[p] = atoi(ini.GetValue(section, "START", "-1"));
         } else {
+#ifndef XTSCONSOLE
             KEY_UP[p] = (SDL_Scancode)atoi(ini.GetValue(section, "UP", "82"));
             KEY_DOWN[p] = (SDL_Scancode)atoi(ini.GetValue(section, "DOWN", "81"));
             KEY_LEFT[p] = (SDL_Scancode)atoi(ini.GetValue(section, "LEFT", "80"));
@@ -111,6 +114,7 @@ void load_settings()
             KEY_B[p] = (SDL_Scancode)atoi(ini.GetValue(section, "B", "22"));
             KEY_SELECT[p] = (SDL_Scancode)atoi(ini.GetValue(section, "SELECT", "44"));
             KEY_START[p] = (SDL_Scancode)atoi(ini.GetValue(section, "START", "40"));
+#endif
         }
     }
 }
@@ -123,7 +127,7 @@ void save_settings()
     char buf[2] = {0};
     sprintf(buf, "%d", last_window_size);
     ini.SetValue("screen", "size", buf);
-
+#ifndef XTSCONSOLE
     /* Control settings */
     for (int p = 0; p < 1; p++)
     {
@@ -147,7 +151,7 @@ void save_settings()
         ini.SetValue("section", "START", buf);
         ini.SetValue("section", "usejoy", useJoystick[p]?"yes":"no");
     }
-   
+#endif
     char path[CONFIG_PATH_MAX];
     ini.SaveFile(get_config_path(path, sizeof(path)));
 }

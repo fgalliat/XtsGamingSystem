@@ -15,6 +15,10 @@
  #include "../XtsConsole.h"
  extern XtsConsole console;
  extern Pad* pad;
+
+ uint32_t SDL_GetTicks() {
+      return (u32)console.now();
+ }
 #endif
 
 namespace GUI {
@@ -40,8 +44,8 @@ Menu* menu;
 Menu* mainMenu;
 Menu* settingsMenu;
 Menu* videoMenu;
-Menu* keyboardMenu[2];
-Menu* joystickMenu[2];
+// Menu* keyboardMenu[2];
+// Menu* joystickMenu[2];
 FileMenu* fileMenu;
 
 bool pause = true;
@@ -108,14 +112,18 @@ printf("GUI::init (8)\n");
     // Menus:
     mainMenu = new Menu;
     mainMenu->add(new Entry("Load ROM", []{ menu = fileMenu; }));
+#ifndef XTSCONSOLE
     mainMenu->add(new Entry("Settings", []{ menu = settingsMenu; }));
+#endif
     mainMenu->add(new Entry("Exit",     []{ exit(0); }));
 
     settingsMenu = new Menu;
     settingsMenu->add(new Entry("<",            []{ menu = mainMenu; }));
     settingsMenu->add(new Entry("Video",        []{ menu = videoMenu; }));
+#ifndef XTSCONSOLE
     settingsMenu->add(new Entry("Controller 1", []{ menu = useJoystick[0] ? joystickMenu[0] : keyboardMenu[0]; }));
     settingsMenu->add(new Entry("Controller 2", []{ menu = useJoystick[1] ? joystickMenu[1] : keyboardMenu[1]; }));
+#endif
     settingsMenu->add(new Entry("Save Settings", []{ save_settings(); menu = mainMenu; }));
 
     videoMenu = new Menu;
@@ -124,7 +132,7 @@ printf("GUI::init (8)\n");
     videoMenu->add(new Entry("Size 2x", []{ set_size(2); }));
     videoMenu->add(new Entry("Size 3x", []{ set_size(3); }));
     videoMenu->add(new Entry("Size 4x", []{ set_size(4); }));
-
+#ifndef XTSCONSOLE
     for (int i = 0; i < 2; i++)
     {
         keyboardMenu[i] = new Menu;
@@ -157,7 +165,7 @@ printf("GUI::init (8)\n");
         }
         #endif
     }
-
+#endif
     fileMenu = new FileMenu;
 
     menu = mainMenu;

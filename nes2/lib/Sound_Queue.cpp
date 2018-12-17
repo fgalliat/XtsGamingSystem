@@ -24,7 +24,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 // Return current SDL_GetError() string, or str if SDL didn't have a string
 static const char *sdl_error(const char *str)
 {
+#ifndef XTSCONSOLE
 	const char *sdl_str = SDL_GetError();
+#else
+	const char *sdl_str = "SDL Error !";
+#endif
 	if (sdl_str && *sdl_str)
 		str = sdl_str;
 	return str;
@@ -33,7 +37,9 @@ static const char *sdl_error(const char *str)
 Sound_Queue::Sound_Queue()
 {
 	bufs = NULL;
+#ifndef XTSCONSOLE
 	free_sem = NULL;
+#endif
 	write_buf = 0;
 	write_pos = 0;
 	read_buf = 0;
@@ -42,16 +48,16 @@ Sound_Queue::Sound_Queue()
 
 Sound_Queue::~Sound_Queue()
 {
+#ifndef XTSCONSOLE
 	if (sound_open)
 	{
-#ifndef XTSCONSOLE
 		SDL_PauseAudio(true);
 		SDL_CloseAudio();
-#endif
 	}
 
 	if (free_sem)
 		SDL_DestroySemaphore(free_sem);
+#endif
 
 	delete[] bufs;
 }
@@ -129,7 +135,8 @@ void Sound_Queue::write(const sample_t *in, int count)
 #endif
 }
 
-void Sound_Queue::fill_buffer(Uint8 *out, int count)
+// void Sound_Queue::fill_buffer(Uint8 *out, int count)
+void Sound_Queue::fill_buffer(uint8_t *out, int count)
 {
 #ifndef XTSCONSOLE
 	if (SDL_SemValue(free_sem) < buf_count - 1)
@@ -145,7 +152,8 @@ void Sound_Queue::fill_buffer(Uint8 *out, int count)
 #endif
 }
 
-void Sound_Queue::fill_buffer_(void *user_data, Uint8 *out, int count)
+// void Sound_Queue::fill_buffer_(void *user_data, Uint8 *out, int count)
+void Sound_Queue::fill_buffer_(void *user_data, uint8_t *out, int count)
 {
 #ifndef XTSCONSOLE
 	((Sound_Queue *)user_data)->fill_buffer(out, count);

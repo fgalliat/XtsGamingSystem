@@ -1,6 +1,16 @@
 #pragma once
+
+#include <stdint.h>
+
 #ifndef XTSCONSOLE
 #include <SDL2/SDL.h>
+#else
+  #define SDL_SCANCODE_UP 82 
+  #define SDL_SCANCODE_DOWN 81
+  #define SDL_SCANCODE_LEFT 80
+  #define SDL_SCANCODE_RIGHT 79
+  #define SDL_SCANCODE_RETURN 13 
+  uint32_t SDL_GetTicks();
 #endif
 #include <string>
 #include <Nes_Apu.h>

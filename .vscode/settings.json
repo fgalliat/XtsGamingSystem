@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.tcc": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "string": "cpp"
     }
 }

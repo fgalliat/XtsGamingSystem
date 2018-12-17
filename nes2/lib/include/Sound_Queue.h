@@ -6,7 +6,11 @@
 #ifndef SOUND_QUEUE_H
 #define SOUND_QUEUE_H
 
+#include <stdint.h>
+
+#ifndef XTSCONSOLE
 #include <SDL2/SDL.h>
+#endif
 
 // Simple SDL sound wrapper that has a synchronous interface
 class Sound_Queue {
@@ -29,15 +33,19 @@ private:
 	enum { buf_size = 2048 };
 	enum { buf_count = 3 };
 	sample_t* volatile bufs;
+#ifndef XTSCONSOLE
 	SDL_sem* volatile free_sem;
+#endif
 	int volatile read_buf;
 	int write_buf;
 	int write_pos;
 	bool sound_open;
 	
 	sample_t* buf( int index );
-	void fill_buffer( Uint8*, int );
-	static void fill_buffer_( void*, Uint8*, int );
+	// void fill_buffer( Uint8*, int );
+	void fill_buffer( uint8_t*, int );
+	// static void fill_buffer_( void*, Uint8*, int );
+	static void fill_buffer_( void*, uint8_t*, int );
 };
 
 #endif

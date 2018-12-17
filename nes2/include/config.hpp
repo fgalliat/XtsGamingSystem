@@ -1,7 +1,9 @@
 #pragma once
 #include <cerrno>
 #include <sys/stat.h>
+#ifndef XTSCONSOLE
 #include <SDL2/SDL.h>
+#endif
 
 #define CONFIG_DIR_DEFAULT_MODE      S_IRWXU | S_IRGRP |  S_IXGRP | S_IROTH | S_IXOTH
 #define USE_CONFIG_DIR true
@@ -18,6 +20,7 @@ void save_settings();
 const char* get_config_path(char * buf, int buflen);
 
 extern int last_window_size;
+#ifndef XTSCONSOLE
 extern SDL_Scancode KEY_A     [];
 extern SDL_Scancode KEY_B     [];
 extern SDL_Scancode KEY_SELECT[];
@@ -26,6 +29,7 @@ extern SDL_Scancode KEY_UP    [];
 extern SDL_Scancode KEY_DOWN  [];
 extern SDL_Scancode KEY_LEFT  [];
 extern SDL_Scancode KEY_RIGHT [];
+#endif
 extern int BTN_UP    [];
 extern int BTN_DOWN  [];
 extern int BTN_LEFT  [];

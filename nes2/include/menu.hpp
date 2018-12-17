@@ -1,6 +1,12 @@
 #pragma once
 #include <functional>
+#ifndef XTSCONSOLE
 #include <SDL2/SDL.h>
+#else
+  #define SDL_SCANCODE_UP 82 
+  #define SDL_SCANCODE_DOWN 81
+  #define SDL_SCANCODE_RETURN 13 
+#endif
 #include <string>
 #include <vector>
 #include "gui.hpp"
@@ -16,9 +22,10 @@ class Entry
     std::function<void()> callback;
 
     bool selected = false;
+#ifndef XTSCONSOLE
     SDL_Texture* whiteTexture = nullptr;
     SDL_Texture* redTexture   = nullptr;
-
+#endif
   public:
     Entry(std::string label, std::function<void()> callback = []{}, int x = TEXT_CENTER, int y = 0);
     ~Entry();
@@ -37,12 +44,16 @@ class Entry
 
 class ControlEntry : public Entry
 {
+  #ifndef XTSCONSOLE
     SDL_Scancode* key;
+  #endif
     int* button;
     Entry* keyEntry;
 
   public:
+  #ifndef XTSCONSOLE
     ControlEntry(std::string action, SDL_Scancode* key, int x = 0, int y = 0);
+  #endif  
     ControlEntry(std::string action, int* button, int x = 0, int y = 0);
     void setY(int y) { Entry::setY(y);    keyEntry->setY(y);    }
     void select()    { Entry::select();   keyEntry->select();   }

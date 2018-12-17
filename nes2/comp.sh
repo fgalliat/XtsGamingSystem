@@ -63,4 +63,5 @@ if [ -f build/$(basename $i).o ]
 done
 
 echo "Linking whole"
- g++ $FLAGS build/*.o -o ./laines -lSDL2 -lSDL2_image -lSDL2_ttf -lpthread
+ # g++ $FLAGS build/*.o -o ./laines -lSDL2 -lSDL2_image -lSDL2_ttf -lpthread
+ g++ $FLAGS build/*.o -o ./laines $LIBS
