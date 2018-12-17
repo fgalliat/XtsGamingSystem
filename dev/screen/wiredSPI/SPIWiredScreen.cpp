@@ -379,12 +379,14 @@
         	location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
                        (y +yy +vinfo.yoffset) * finfo.line_length;
         	
-        	//memcpy( *(fbp+location), raster[(yy * width) + 0], width*2);
+        	// memcpy( (uint8_t*) *((fbp+location)), (const uint8_t*)raster[(yy * width) + 0], width*2);
+        	memcpy( (uint8_t*) &((fbp[location])), (const uint8_t*)&((uint8_t*)raster)[(yy * (width*2)) + 0], width*2 );
+        	/*
         	for (int xx = 0; xx < width; xx++) {
         		color = raster[(yy * width) + (xx)];
         		*((unsigned short int*)(fbp + location)) = color;
         		location+=2;
-        	}
+        	}*/
         	
         	/*
             for (int xx = 0; xx < width; xx++)
