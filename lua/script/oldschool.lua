@@ -145,7 +145,8 @@ while true do
  	-- =============================
  	
  	
- 	-- drawStarFieldFrame(screenIter)
+	 -- drawStarFieldFrame(screenIter)
+	lcd.blitt(0);
  	lcd.fx(1,1)
  	
  	-- lcd.sprite( "/.PCT", (320-160)/2, (240-128)/2, 16, 16, 0,0 )
@@ -184,7 +185,7 @@ while true do
  	local baseLine = "Demo by Xtase @Dec 2018"
  	lcd.dispStr( baseLine, (LCD_WIDTH-(baseLine:len()*7)), 232, white)
 	
-
+	lcd.blitt(2);
 	
 	if ( math.fmod(loopCpt, 2) == 0 ) then
 		local pads = pad.read()

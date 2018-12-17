@@ -58,6 +58,7 @@ static int lcd_blitt (lua_State *L) {
 	// if empty => 0
 	// if error => auto handled as num_expected
 	int mode = (int)luaL_optinteger(L, 1, EXIT_SUCCESS);
+	console.getScreen()->blitt(mode);
 	
 	// printf("LCD blitt %d\n", mode);
 	return 1;
