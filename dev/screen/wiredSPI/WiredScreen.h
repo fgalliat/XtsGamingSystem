@@ -57,6 +57,37 @@
   #define SIG_SCR_TXTMODE       0x26
   // ____________________________________________
 
+  class GfxSlot {
+    private:
+      uint8_t slotNum;
+      uint16_t raster[ SCREEN_WIDTH *  SCREEN_HEIGHT ];
+    public:
+      uint16_t width;
+      uint16_t height;
+
+      GfxSlot(uint8_t slotNum, uint16_t width=0, uint16_t height=0, uint16_t* raster=NULL) { 
+        this->slotNum = slotNum;
+        // this->rewrite(width, height,raster);
+      }
+
+      // void rewrite(uint16_t width, uint16_t height, uint16_t* raster) { 
+      //   this->width = width;
+      //   this->height = height;
+      //   if (raster==NULL) { return; }
+      //   //this->raster = raster;
+      //   memcpy( this->raster, raster, width*height*2 ); // *2 'cause u16
+      // }
+
+      uint8_t getSlotNum() { return this->slotNum; }
+      uint16_t getWidth() { return this->width; }
+      uint16_t getHeight() { return this->height; }
+      uint16_t* getRaster() { return this->raster; }
+
+  };
+
+
+  // ____________________________________________
+
   class WiredScreen {
       private:
       	void drawBitmapImg(int x, int y, uint8_t* raster, int color);
@@ -67,6 +98,12 @@
       	int_least16_t drawChar(int_least16_t x, int_least16_t y, char c, uint_least16_t color, uint_least16_t bg, uint_least8_t size);
       	void DrawChar(char c, uint16_t x, uint16_t y, uint16_t color);
       
+        #define NB_GFX_SLOTS 6
+
+        GfxSlot slots[NB_GFX_SLOTS] = {
+          GfxSlot(0), GfxSlot(1), GfxSlot(2), GfxSlot(3), GfxSlot(4), GfxSlot(5),
+        };
+
       public:
         WiredScreen();
         ~WiredScreen();
@@ -87,6 +124,22 @@
         void drawPCT(char* name, int x, int y);
         void drawPCTSprite(char* name, int x, int y, int w, int h, int sx, int sy);
         
+        // -== GfxSlot Support ==-
+        GfxSlot* loadPCTSlot(int slotNum, char* filename);
+
+        void drawSlotBack(int slotNum, int x, int y) {
+          if ( slotNum < 0 || slotNum >= NB_GFX_SLOTS ) { return; }
+          GfxSlot slot = slots[slotNum]; 
+          this->drawColoredImg(x, y, slot.width, slot.height, slot.getRaster() );
+        }
+
+        void drawSlotSprite(int slotNum, int x, int y, int w, int h, int sx, int sy, uint16_t transparentColor = 0x0001) {
+          if ( slotNum < 0 || slotNum >= NB_GFX_SLOTS ) { return; }
+          GfxSlot slot = slots[slotNum]; 
+          this->drawColoredSprite(x, y, slot.width, slot.height, sx, sy, w, h, slot.getRaster());
+        }
+        // -== GfxSlot Support ==-
+
         void drawRGB16(int x, int y, int w, int h, uint16_t* raster);
 
         void drawPixel(int x, int y, uint16_t color=1);

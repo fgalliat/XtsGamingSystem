@@ -305,6 +305,73 @@
     #define PCT_HEADER_LEN 7
     static uint16_t color_picturebuff[ MEM_RAST_LEN_u16 ];
 
+    // ===========================
+    // filename ex. "/CARO.PCT" --or-- null to recall last one
+    GfxSlot* WiredScreen::loadPCTSlot(int slotNum, char* filename) {
+        if ( slotNum < 0 || slotNum >= NB_GFX_SLOTS ) { return NULL; }
+        if ( filename == NULL ) { return NULL; }
+        GfxSlot slot = slots[slotNum]; 
+
+        static int w=-1, h=-1; // img size
+    	static char header[PCT_HEADER_LEN];
+
+          // ==============================
+	      char* entryName = getAssetEntryName(filename);
+	      // =============================
+
+        FILE* f = fopen(entryName, "r");
+	      if ( !f ) { error("(PCT) File not ready"); return NULL; }
+	      fseek(f, 0, SEEK_SET);
+	      int readed = fread( header, 1, PCT_HEADER_LEN, f );
+	
+	      if ( header[0] == '6' && header[1] == '4' && header[2] == 'K' ) {
+	          w = ((uint16_t)header[3]*256) + ((uint16_t)header[4]);
+	          h = ((uint16_t)header[5]*256) + ((uint16_t)header[6]);
+	      } else {
+	          warn( "(PCT) Wrong PCT header" );
+	          //mcu->print( (int)header[0] );
+	          //mcu->print( ',' );
+	          //mcu->print( (int)header[1] );
+	          //mcu->print( ',' );
+	          //mcu->print( (int)header[2] );
+	          //mcu->println( "");
+	          // mcu->println( header );
+	      }
+	//printf("PCT.3 %d x %d \n", w, h);
+	      // Serial.print("A.2 "); Serial.print(w); Serial.print('x');Serial.print(h);Serial.println("");
+	      if( w <= 0 || h <= 0 ) {
+	        error("Wrong size ");
+	        //mcu->print(w);
+	        //mcu->print("x");
+	        //mcu->print(h);
+	        //mcu->println("");
+	        fclose(f);
+	        return NULL;
+	      }
+
+	      int scanZoneSize = w*h*2; // *2 -> u16
+	      int startX = screenOffsetX+x;
+	      int startY = screenOffsetY+y;
+
+          slot.width = w;
+          slot.height = h;
+
+	      int yy = 0;
+	    //   while( true ) { 
+	        // BEWARE : @ this time : h need to be 128
+	        readed = fread( (uint8_t*)slot.getRaster(), 1, scanZoneSize, f );
+	    //     this->drawColoredImg(startX, startY+yy, w, MEM_RAST_HEIGHT, color_picturebuff);
+	    //     yy += MEM_RAST_HEIGHT;
+	    //     if ( yy + (MEM_RAST_HEIGHT) > h ) { break; }
+	    //   }
+	
+	      fclose(f);
+
+        return &slot;
+    }
+    // ===========================
+
+
 	// filename ex. "/CARO.PCT" --or-- null to recall last one
     void WiredScreen::drawPCT(char* filename, int x, int y) {
     	static int w=-1, h=-1; // img size
