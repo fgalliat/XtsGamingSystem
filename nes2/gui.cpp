@@ -263,8 +263,10 @@ void new_frame(u32* pixels)
     SDL_UpdateTexture(gameTexture, NULL, pixels, WIDTH * sizeof(u32));
 }
 #else
+int frameCpt =  0;
 void new_frame(u16* pixels)
 {
+	if ( frameCpt++ % 2 == 1 ) { return; }
     static const int w = 256;
     static const int h = 240;
     static const int x = ( 320-w ) / 2;
@@ -386,6 +388,9 @@ void run()
 #else
 //    printf("poll console \n"); // it always do...
 // console.delay(30); // TMP slow down keypad
+
+if (pause) { // TMP : remove keypad listening while play...
+
   pad = console.readPad();
 //   printf("polled console \n");
   if (pad == NULL) printf("null pad \n");
@@ -403,6 +408,7 @@ void run()
       }
   }
   
+}  
 #endif
 // printf("run.B \n");
         if (not pause) CPU::run_frame();
@@ -415,7 +421,7 @@ void run()
             #ifndef XTSCONSOLE
             SDL_Delay((int)(DELAY - frameTime));
             #else
-            console.delay( (int)(DELAY - frameTime) );
+           // console.delay( (int)(DELAY - frameTime) );
             #endif
         }
     }
