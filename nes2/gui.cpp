@@ -59,7 +59,7 @@ void set_size(int mul)
 /* Initialize GUI */
 void init()
 {
-printf("GUI::init 1\n");
+// printf("GUI::init 1\n");
     // Initialize graphics system:
     #ifndef XTSCONSOLE
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK);
@@ -70,12 +70,12 @@ printf("GUI::init 1\n");
         joystick[i] = SDL_JoystickOpen(i);
     #endif
 
-printf("GUI::init 4\n");
+// printf("GUI::init 4\n");
 
     APU::init();
     soundQueue = new Sound_Queue;
     soundQueue->init(96000);
-printf("GUI::init (5)\n");
+// printf("GUI::init (5)\n");
 
 #ifndef XTSCONSOLE
     // Initialize graphics structures:
@@ -196,11 +196,9 @@ SDL_Texture* gen_text(std::string text, SDL_Color color)
 /* Get the joypad state from SDL */
 u8 get_joypad_state(int n)
 {
+
     const int DEAD_ZONE = 8000;
-
     u8 j = 0;
-
-// printf( "read Joypad #%d\n", n );
 
 #ifdef XTSCONSOLE
 
@@ -210,7 +208,7 @@ u8 get_joypad_state(int n)
     // polled inside run()
         j |= (pad->bt1())      << 0; // A
         j |= (pad->bt2())      << 1; // B
-        j |= (keys[KEY_SELECT[n]]) << 2;
+        // j |= (keys[KEY_SELECT[n]]) << 2; // keys[...] not defined w/o SDLs
         j |= (pad->start())  << 3;
         j |= (pad->up())     << 4;
         j |= (pad->down())   << 5;
@@ -299,6 +297,7 @@ void render() {
 /* Play/stop the game */
 void toggle_pause()
 {
+// printf("toggle_pause.1\n");
     pause = not pause;
     menu  = mainMenu;
 #ifndef XTSCONSOLE
@@ -312,6 +311,7 @@ console.getScreen()->cls();
 console.getScreen()->dispStr("PAUSE", 60, 60, 1);
 }
 #endif
+// printf("toggle_pause.2\n");
 }
 
 /* Prompt for a key, return the scancode */
@@ -390,13 +390,15 @@ void run()
 //   if ( pad->hasChanged() && pause ) {
   if ( pad->atLeastOne() && pause ) {
       if ( pad->hasChanged() ) {
+        //   printf("run.A \n");
         menu->update(_keys);
       }
   }
   
 #endif
-
+// printf("run.B \n");
         if (not pause) CPU::run_frame();
+// printf("run.C \n");
         render();
 
         // Wait to mantain framerate:

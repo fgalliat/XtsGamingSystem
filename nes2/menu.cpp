@@ -114,8 +114,12 @@ void Menu::update(u8 const* keys)
     entries[oldCursor]->unselect();
     entries[cursor]->select();
 
-    if (keys[SDL_SCANCODE_RETURN])
+    if (keys[SDL_SCANCODE_RETURN]) {
+        #ifdef XTSCONSOLE
+          console.getScreen()->cls();
+        #endif
         entries[cursor]->trigger();
+    }
 }
 
 void Menu::render()

@@ -152,6 +152,7 @@ void NOP() { T; }
 /* Execute a CPU instruction */
 void exec()
 {
+// printf("cpu.exec.1 [%d]\n", (rd(PC)) );
     switch (rd(PC++))  // Fetch the opcode.
     {
         // Select the right function to emulate the instruction:
@@ -237,6 +238,7 @@ void exec()
           return NOP();
         }
     }
+    // printf("cpu.exec.10 \n");
 }
 
 void set_nmi(bool v) { nmi = v; }
@@ -262,6 +264,7 @@ void run_frame()
 {
     remainingCycles += TOTAL_CYCLES;
 
+// printf("cpu.A \n");
     while (remainingCycles > 0)
     {
         if (nmi) INT<NMI>();
@@ -269,8 +272,9 @@ void run_frame()
 
         exec();
     }
-
+// printf("cpu.B \n");
     APU::run_frame(elapsed());
+// printf("cpu.C \n");
 }
 
 
