@@ -7,6 +7,13 @@
  Pad* pad;
 #endif
 
+void *runThread(void *argument) {
+	 GUI::run();
+	 return NULL;
+}
+
+
+
 int main(int argc, char *argv[])
 {
         #ifdef XTSCONSOLE
@@ -19,7 +26,15 @@ int main(int argc, char *argv[])
 
     GUI::load_settings();
     GUI::init();
-    GUI::run();
+    // GUI::run();
+
+	pthread_t thread1;
+	int i1;
+	i1 = pthread_create( &thread1, NULL, runThread, (void*) NULL);
+
+while(true) {
+	console.delay(1000);
+}
 
     return 0;
 }

@@ -272,9 +272,9 @@ void run_frame()
 
         exec();
     }
-// printf("cpu.B \n");
+#ifndef XTSCONSOLE
     APU::run_frame(elapsed());
-// printf("cpu.C \n");
+#endif
 }
 
 

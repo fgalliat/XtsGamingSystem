@@ -15,9 +15,11 @@
  #include "../XtsConsole.h"
  extern XtsConsole console;
  extern Pad* pad;
-
+ static u32 __tickNb = 0;
  uint32_t SDL_GetTicks() {
-      return (u32)console.now();
+      //return (u32)console.now();
+      __tickNb++;
+      return __tickNb;
  }
 #endif
 
@@ -60,6 +62,25 @@ void set_size(int mul)
     #endif
 }
 
+
+#ifdef XTSCONSOLE 
+u16 pixels_copy[256*240]; 
+void *videoThread(void *argument) {
+  static const int w = 256;
+  static const int h = 240;
+  static const int x = ( 320-w ) / 2;
+  static const int y = ( 240-h ) / 2;
+  while( true ) {
+  	if ( !pause ) {
+		console.getScreen()->drawRGB16(x,y,w,h,pixels_copy);
+  	}
+	console.delay(50);
+  }
+  return NULL;
+}
+#endif
+
+
 /* Initialize GUI */
 void init()
 {
@@ -72,13 +93,16 @@ void init()
 
     for (int i = 0; i < SDL_NumJoysticks(); i++)
         joystick[i] = SDL_JoystickOpen(i);
-    #endif
-
-// printf("GUI::init 4\n");
-
     APU::init();
     soundQueue = new Sound_Queue;
     soundQueue->init(96000);
+    #else
+    pthread_t thread1, thread2, thread3;
+	int i1,i2,i3;
+	// i1 = pthread_create( &thread1, NULL, keyThread, (void*) NULL);
+	i2 = pthread_create( &thread2, NULL, videoThread, (void*) NULL);
+    #endif
+
 // printf("GUI::init (5)\n");
 
 #ifndef XTSCONSOLE
@@ -266,18 +290,21 @@ void new_frame(u32* pixels)
 int frameCpt =  0;
 void new_frame(u16* pixels)
 {
-	if ( frameCpt++ % 2 == 1 ) { return; }
-    static const int w = 256;
-    static const int h = 240;
-    static const int x = ( 320-w ) / 2;
-    static const int y = ( 240-h ) / 2;
-    console.getScreen()->drawRGB16(x,y,w,h,pixels);
+	// if ( frameCpt++ % 10 > 0 ) { return; }
+ //   static const int w = 256;
+ //   static const int h = 240;
+ //   static const int x = ( 320-w ) / 2;
+ //   static const int y = ( 240-h ) / 2;
+ //   console.getScreen()->drawRGB16(x,y,w,h,pixels);
+ memcpy(pixels_copy, pixels, 256*240*2);
 }
 #endif
 
 void new_samples(const blip_sample_t* samples, size_t count)
 {
+#ifndef XTSCONSOLE
     soundQueue->write(samples, count);
+#endif
 }
 
 /* Render the screen */
