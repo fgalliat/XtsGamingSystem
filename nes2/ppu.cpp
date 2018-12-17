@@ -4,15 +4,24 @@
 #include "ppu.hpp"
 
 namespace PPU {
-#include "palette.inc"
 
+#ifndef XTSCONSOLE
+#include "palette.inc"
+#else
+#include "palette565.inc"
+#endif
 
 Mirroring mirroring;       // Mirroring mode.
 u8 ciRam[0x800];           // VRAM for nametables.
 u8 cgRam[0x20];            // VRAM for palettes.
 u8 oamMem[0x100];          // VRAM for sprite properties.
 Sprite oam[8], secOam[8];  // Sprite buffers.
+
+#ifndef XTSCONSOLE
 u32 pixels[256 * 240];     // Video buffer.
+#else
+u16 pixels[256 * 240];     // Video buffer.
+#endif
 
 Addr vAddr, tAddr;  // Loopy V, T.
 u8 fX;              // Fine X.

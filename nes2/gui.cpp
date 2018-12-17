@@ -241,10 +241,21 @@ u8 get_joypad_state(int n)
 }
 
 /* Send the rendered frame to the GUI */
+#ifndef XTSCONSOLE
 void new_frame(u32* pixels)
 {
     SDL_UpdateTexture(gameTexture, NULL, pixels, WIDTH * sizeof(u32));
 }
+#else
+void new_frame(u16* pixels)
+{
+    static const int w = 256;
+    static const int h = 240;
+    static const int x = ( 320-w ) / 2;
+    static const int y = ( 240-h ) / 2;
+    console.getScreen()->drawRGB16(x,y,w,h,pixels);
+}
+#endif
 
 void new_samples(const blip_sample_t* samples, size_t count)
 {

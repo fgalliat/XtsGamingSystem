@@ -1,4 +1,5 @@
 // the 565-based colors (64 colors for nes)
+// for XtsGammingSystem 
 u16 nesRgb[] = {
 31727, 31, 23, 16727, 36880, 43012, 43136, 34976, 
 20864, 960, 832, 704, 523, 0, 0, 0, 
