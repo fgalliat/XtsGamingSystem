@@ -82,3 +82,4 @@ while(true) do
 
     frameCpt = frameCpt + 1
 end
+lcd.blitt(2)

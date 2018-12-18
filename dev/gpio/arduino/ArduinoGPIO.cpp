@@ -86,6 +86,7 @@ char *GpioOverArduino::readAllPins()
     // TODO : lock Serial.write ....
 
     delay(80); // less time makes Serial Reading hanging
+    // delay(60); // turbo mode works great w/ mario.lua
     int readed = this->serial->read(buffer, 16 + 1);
     // printf("f:%d bytes read\n", readed);
     // printf("s:%s bytes read\n", buffer);
@@ -96,7 +97,7 @@ char *GpioOverArduino::readAllPins()
         return NULL;
     }
 
-    delay(10);
+    delay(5);
 
     return buffer;
 }
