@@ -244,10 +244,11 @@ static int lcd_ssprite (lua_State *L) {
 	
 	int          sx = (int)luaL_optinteger(L, 6, EXIT_SUCCESS);
 	int          sy = (int)luaL_optinteger(L, 7, EXIT_SUCCESS);
-	
-	// TODO : transparent color
+
 	int transparent = 0x0001;
-	transparent = 0x7e0; // mario green
+	int          sc = (int)luaL_optinteger(L, 8, EXIT_SUCCESS);
+	if ( sc ) { transparent = sc; }
+	// transparent = 0x7e0; // mario green -> 255, 0, 255, 0
 
 	console.getScreen()->drawSlotSprite( sltNum, x, y, w, h, sx, sy, transparent );
 	return 1;

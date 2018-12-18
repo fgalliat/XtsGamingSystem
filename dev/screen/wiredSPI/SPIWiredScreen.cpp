@@ -512,13 +512,13 @@ void doBlitt()
             for (int xx = 0; xx < width; xx++)
             {
                 color = picBuff[(yy * width) + (xx)];
-                if ( color == transparentColor ) { continue; }
                 // 'color' is 565 colored (for ILI9341 raw)
 
 			      #ifdef INTEL_MODE
 			        // Intel endian ?
 			        color = (color%256)*256 + color/256;
 			      #endif
+                  if ( color == transparentColor ) { continue; }
 			
 			      int _r = (unsigned int)((color >> 11) * (255/31) /* % (unsigned char)0xF8*/ );
 			      int _g = (unsigned int)(( ((color) >> 5) % (unsigned char)0x40) * (255/63) /*% (unsigned char)0xFC*/);

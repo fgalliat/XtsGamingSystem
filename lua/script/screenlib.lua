@@ -8,19 +8,21 @@ LCD_HEIGHT = 240
 
 Sprite = {
     width=16,height=16,slot=0,
+    transparent= 0
 }
 Sprite.__index = Sprite
 
-function Sprite.new(slot, width, height)
+function Sprite.new(slot, width, height, transparent)
   local self = setmetatable({}, Sprite)
   self.slot = slot
   self.width = width
   self.height = height
+  self.transparent = transparent
   return self;
 end
 
 function Sprite:draw(x,y, xMat, yMat)
-    lcd.ssprite(self.slot, x,y, self.width,self.height, (self.width*xMat), (self.height*yMat))
+    lcd.ssprite(self.slot, x,y, self.width,self.height, (self.width*xMat), (self.height*yMat), self.transparent)
 end
 
 SpriteGrabb = {
@@ -36,12 +38,12 @@ function SpriteGrabb.new(sprt, xMat, yMat)
     return self;
   end
   
-  function SpriteGrabb:draw(x,y)
+  function SpriteGrabb:draw(x,y, transparent)
       self.sprt:draw( x,y, self.xMat, self.yMat )
   end
 
 
-  function makeSprite(num, file, width, height)
+  function makeSprite(num, file, width, height, transparent)
     lcd.sload(num, file)
-    return Sprite.new(num, width, height)
+    return Sprite.new(num, width, height, transparent)
   end

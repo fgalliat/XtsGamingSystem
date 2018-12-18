@@ -3,7 +3,7 @@ dofile("./script/screenlib.lua")
 lcd.sload(0, "/MARIOBK1.PCT")
 
 local sprites = makeSprite( 2, "/DRMARIO.PCT", 12, 12 )
-local sprites2 = makeSprite( 3, "/MARIOSP1.PCT", 16, 16 )
+local sprites2 = makeSprite( 3, "/MARIOSP1.PCT", 16, 16, 0x7e0 )
 local pill0L = SpriteGrabb.new(sprites, 0,0) -- left
 local pill0R = SpriteGrabb.new(sprites, 1,0) -- right
 local pill0D = SpriteGrabb.new(sprites, 2,0) -- down
