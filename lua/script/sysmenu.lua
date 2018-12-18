@@ -92,6 +92,7 @@ CHOICES = {
                                                            {lbl="Tetris",   script="tetris.lua"}, 
                                                            {lbl="OutRun",   script="outrun.lua"}, 
                                                            {lbl="OldSchool",   script="oldschool.lua"}, 
+                                                           {lbl="Mario",   script="mario.lua"}, 
                                                            {lbl="HardwareTest",   script="hardware.lua"} } },
                                 { lbl="Console >", items={ {lbl="GB",  exec="../gb/xgb"}, 
                                                            {lbl="NES", exec="../nes/xnes ../nes/roms/Dr.\\ Mario\\ \\(E\\)\\ \\[\\!\\].nes"} } },

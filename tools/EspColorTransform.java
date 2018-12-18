@@ -142,7 +142,9 @@ public class EspColorTransform {
             if (args != null && args.length == 0) {
                 // args = new String[] { "./images/boot.png" };
                 // args = new String[] { "./images/GODSFNT.png" };
-                args = new String[] { "./images/DRMARIO.png" };
+                // args = new String[] { "./images/DRMARIO.png" };
+                // args = new String[] { "./images/MARIOBK1.png" };
+                args = new String[] { "./images/MARIOSP1.png" };
             }
 
             if (args != null && args.length == 1) {
