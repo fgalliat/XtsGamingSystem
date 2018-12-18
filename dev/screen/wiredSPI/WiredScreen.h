@@ -91,8 +91,8 @@
   class WiredScreen {
       private:
       	void drawBitmapImg(int x, int y, uint8_t* raster, int color);
-      	void drawColoredImg(int x, int y, int w, int h, uint16_t* raster);
-      	void drawColoredSprite(int x, int y, int w, int h, int sx, int sy, int sw, int sh, uint16_t* raster);
+      	void drawColoredImg(int x, int y, int w, int h, uint16_t* raster, uint16_t transparentColor = 0x0001);
+      	void drawColoredSprite(int x, int y, int w, int h, int sx, int sy, int sw, int sh, uint16_t* raster, uint16_t transparentColor = 0x0001);
       	void drawPixShaded(int x, int y, uint16_t color, int fromMode );
       	
       	int_least16_t drawChar(int_least16_t x, int_least16_t y, char c, uint_least16_t color, uint_least16_t bg, uint_least8_t size);
@@ -139,7 +139,7 @@
         void drawSlotSprite(int slotNum, int x, int y, int w, int h, int sx, int sy, uint16_t transparentColor = 0x0001) {
           if ( slotNum < 0 || slotNum >= NB_GFX_SLOTS ) { return; }
           GfxSlot slot = slots[slotNum]; 
-          this->drawColoredSprite(x, y, w, h, sx, sy, slot.width, slot.height, slot.getRaster());
+          this->drawColoredSprite(x, y, w, h, sx, sy, slot.width, slot.height, slot.getRaster(), transparentColor);
         }
         // -== GfxSlot Support ==-
 

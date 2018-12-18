@@ -503,7 +503,7 @@ void doBlitt()
 	}
 
     
-    void WiredScreen::drawColoredImg(int x, int y, int width, int height, uint16_t* picBuff) {
+    void WiredScreen::drawColoredImg(int x, int y, int width, int height, uint16_t* picBuff, uint16_t transparentColor) {
     	// int width = scanSize / height / 2;
         // width = scanSize; //???
         uint16_t color, c16b;
@@ -512,6 +512,7 @@ void doBlitt()
             for (int xx = 0; xx < width; xx++)
             {
                 color = picBuff[(yy * width) + (xx)];
+                if ( color == transparentColor ) { continue; }
                 // 'color' is 565 colored (for ILI9341 raw)
 
 			      #ifdef INTEL_MODE
@@ -577,7 +578,7 @@ void doBlitt()
         }
     }
     
-    void WiredScreen::drawColoredSprite(int dx, int dy, int dw, int dh, int sx, int sy, int sw, int sh, uint16_t* color_picturebuff) {
+    void WiredScreen::drawColoredSprite(int dx, int dy, int dw, int dh, int sx, int sy, int sw, int sh, uint16_t* color_picturebuff, uint16_t transparentColor) {
         //#ifndef COMPUTER
 	    static int lastOffset=-1,lastW=-1,lastH=-1;
 	    // BEWARE : mem overflow !!!!!
@@ -609,7 +610,7 @@ void doBlitt()
 	    dy += screenOffsetY;
 	
 	    //display.pushImage(dx, dy, dw, dh, subImage);
-	    this->drawColoredImg(dx, dy, dw, dh, subImage);
+	    this->drawColoredImg(dx, dy, dw, dh, subImage, transparentColor);
         doBlitt();
     }
 

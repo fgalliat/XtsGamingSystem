@@ -3,7 +3,7 @@ dofile("./script/screenlib.lua")
 lcd.sload(0, "/MARIOBK1.PCT")
 
 local sprites = makeSprite( 2, "/DRMARIO.PCT", 12, 12 )
-local sprites2 = makeSprite( 3, "/MARIOSP1.PCT", 18, 19 )
+local sprites2 = makeSprite( 3, "/MARIOSP1.PCT", 16, 16 )
 local pill0L = SpriteGrabb.new(sprites, 0,0) -- left
 local pill0R = SpriteGrabb.new(sprites, 1,0) -- right
 local pill0D = SpriteGrabb.new(sprites, 2,0) -- down
@@ -24,5 +24,6 @@ lcd.blitt(0)
 lcd.blitt(2)
 
 while(true) do
+    if pad.read().start then break end
   lcd.delay(50)
 end

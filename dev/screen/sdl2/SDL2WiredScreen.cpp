@@ -724,7 +724,7 @@ void WiredScreen::drawRGB16(int x, int y, int width, int height, uint16_t *raste
     doBlitt();
 }
 
-void WiredScreen::drawColoredImg(int x, int y, int width, int height, uint16_t *picBuff)
+void WiredScreen::drawColoredImg(int x, int y, int width, int height, uint16_t *picBuff, uint16_t transparentColor)
 {
     // int width = scanSize / height / 2;
     // width = scanSize; //???
@@ -741,6 +741,7 @@ void WiredScreen::drawColoredImg(int x, int y, int width, int height, uint16_t *
             // Intel endian ?
             color = (color % 256) * 256 + color / 256;
 #endif
+            if ( color == transparentColor ) { continue; }
 
             int _r = (unsigned int)((color >> 11) * (255 / 31) /* % (unsigned char)0xF8*/);
             int _g = (unsigned int)((((color) >> 5) % (unsigned char)0x40) * (255 / 63) /*% (unsigned char)0xFC*/);
@@ -831,7 +832,7 @@ void WiredScreen::drawPCTSprite(char *filename, int dx, int dy, int dw, int dh, 
     doBlitt();
 }
 
-void WiredScreen::drawColoredSprite(int dx, int dy, int dw, int dh, int sx, int sy, int sw, int sh, uint16_t *color_picturebuff)
+void WiredScreen::drawColoredSprite(int dx, int dy, int dw, int dh, int sx, int sy, int sw, int sh, uint16_t *color_picturebuff, uint16_t transparentColor)
 {
     //#ifndef COMPUTER
     static int lastOffset = -1, lastW = -1, lastH = -1;
@@ -866,7 +867,7 @@ void WiredScreen::drawColoredSprite(int dx, int dy, int dw, int dh, int sx, int 
     dy += screenOffsetY;
 
     //display.pushImage(dx, dy, dw, dh, subImage);
-    this->drawColoredImg(dx, dy, dw, dh, subImage);
+    this->drawColoredImg(dx, dy, dw, dh, subImage, transparentColor);
 }
 
 bool _DBUG = false;
