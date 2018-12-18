@@ -9,8 +9,10 @@
 
 -- ////////////////////////////////////////
 
-SCREEN_HEIGHT = 240
-SCREEN_WIDTH = 320
+dofile("./script/screenlib.lua")
+
+SCREEN_HEIGHT = LCD_HEIGHT
+SCREEN_WIDTH = LCD_WIDTH
 _GLOBAL_isPC = false
 
 ScreenHeight = SCREEN_HEIGHT
@@ -28,6 +30,27 @@ KEY = { PRESSED = 0, RELEASED = 3,
         RIGHT = 39, ROTATE_PIECE = 38 }
 
 
+-- ////////////////////////////////////////
+local sprites = makeSprite( 2, "/DRMARIO.PCT", 12, 12 )
+local pill0L = SpriteGrabb.new(sprites, 0,0) -- left
+local pill0R = SpriteGrabb.new(sprites, 1,0) -- right
+local pill0D = SpriteGrabb.new(sprites, 2,0) -- down
+local pill0U = SpriteGrabb.new(sprites, 3,0) -- up
+
+local piecesGrabs = {
+  pill0L,
+  SpriteGrabb.new(sprites, 0,1),
+  SpriteGrabb.new(sprites, 0,2),
+  SpriteGrabb.new(sprites, 0,3),
+  pill0R,
+  SpriteGrabb.new(sprites, 1,1),
+  SpriteGrabb.new(sprites, 1,2),
+  SpriteGrabb.new(sprites, 1,3),
+  pill0D,
+  SpriteGrabb.new(sprites, 2,1),
+  SpriteGrabb.new(sprites, 2,2),
+  SpriteGrabb.new(sprites, 2,3),
+}
 -- ////////////////////////////////////////
 
 
@@ -268,7 +291,7 @@ function newCPiece()
   local v = { x = 6, y = 1, rot = 1 }
   v.ptype = math.random(#gAllPieces) -- piece type from 1 to number of pieces (7)
   
-  print( "New piece #".. v.ptype )
+  -- print( "New piece #".. v.ptype )
   
   setmetatable(v, CPiece_mt)
   return v
@@ -292,10 +315,21 @@ function CBoard_mt.disp(self, x, y)
 --erase
 CTBL_DrawRect(x, y, self.w*BlockSize,self.h* BlockSize, 0)
 
-  CTBL_DrawRect(x, y, BlockSize, (self.h+2)*BlockSize, BorderColor) -- Left
-  CTBL_DrawRect(x+(self.w+1)*BlockSize, y, BlockSize, (self.h+2)*BlockSize, BorderColor) -- Right
-  CTBL_DrawRect(x+BlockSize, y, self.w*BlockSize, BlockSize, BorderColor) -- Top
-  CTBL_DrawRect(x+BlockSize, y+(self.h+1)*BlockSize, self.w*BlockSize, BlockSize, BorderColor) -- Bottom
+  -- CTBL_DrawRect(x, y, BlockSize, (self.h+2)*BlockSize, BorderColor) -- Left
+  -- CTBL_DrawRect(x+(self.w+1)*BlockSize, y, BlockSize, (self.h+2)*BlockSize, BorderColor) -- Right
+  -- CTBL_DrawRect(x+BlockSize, y, self.w*BlockSize, BlockSize, BorderColor) -- Top
+  -- CTBL_DrawRect(x+BlockSize, y+(self.h+1)*BlockSize, self.w*BlockSize, BlockSize, BorderColor) -- Bottom
+  -- left right
+  for i=0,self.h+2-1 do
+    pill0U:draw(x,y+( BlockSize * i ))
+    pill0U:draw(x+(self.w+1)*BlockSize,y+( BlockSize * i ))
+  end
+  -- down up
+  for i=0,self.w+2-1 do
+    pill0L:draw(x+( BlockSize * i ),y+(self.h+1)*BlockSize)
+    pill0R:draw(x+( BlockSize * i ),y)
+  end
+
 
   for j=1,self.h do
     for i=1,self.w do
@@ -303,7 +337,8 @@ CTBL_DrawRect(x, y, self.w*BlockSize,self.h* BlockSize, 0)
         --CTBL:DrawRect(x+i*BlockSize, y+j*BlockSize, BlockSize, BlockSize, gColors[self.cases[i][j]])
         --CTBL_DrawRect(x+i*BlockSize, y+j*BlockSize, BlockSize, BlockSize, gColors[self.cases[i][j]])
         
-        CTBL_DrawRect(x+i*BlockSize, y+j*BlockSize, BlockSize, BlockSize, self.cases[i][j] )
+        --CTBL_DrawRect(x+i*BlockSize, y+j*BlockSize, BlockSize, BlockSize, self.cases[i][j] )
+        piecesGrabs[ self.cases[i][j] ]:draw( x+i*BlockSize, y+j*BlockSize )
       end
     end
   end
