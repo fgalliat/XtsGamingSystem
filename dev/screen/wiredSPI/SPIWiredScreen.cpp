@@ -31,6 +31,7 @@
     static int x = 0, y = 0;
     static long int location = 0;
 
+    static uint16_t dblBuff[SCREEN_WIDTH*SCREEN_HEIGHT];
 
     WiredScreen::WiredScreen() {
         srand( time( NULL ) );
@@ -84,14 +85,34 @@
         ::close(fbfd);
     }
 
+bool _BLITT_LOCKED = false;
+
+#define DBL_BUFF 1
+
+void doBlitt()
+{
+    if (_BLITT_LOCKED)
+    {
+        return;
+    }
+#ifdef DBL_BUFF
+    memcpy(fbp, dblBuff, SCREEN_WIDTH*SCREEN_HEIGHT*2);
+#endif
+}
+
     void WiredScreen::blitt(uint8_t mode) {
-        // int len = 2; txBuff[0] = SIG_SCR_BLITT; txBuff[1] = mode; 
-	    // serial->write( txBuff, len );
-	    // flushRX(serial);
+        _BLITT_LOCKED = false;
+        if ( mode == 0 ) {
+            _BLITT_LOCKED = true;
+        }
+        else if ( mode == 2 ) {
+            doBlitt();
+        }
     }
 
     void WiredScreen::cls() {
         this->drawRect(0,0,SCREEN_WIDTH,SCREEN_HEIGHT,1,0);
+        doBlitt();
     }
 
 	int ttyX = 0, ttyY = 0;
@@ -139,6 +160,7 @@
     			ttyX = 0;
     		}
     	}
+        doBlitt();
     }
     
     void WiredScreen::println(char* str) {
@@ -159,6 +181,7 @@
     		}
     		x += 6;
     	}
+        doBlitt();
     }
 
 
@@ -280,7 +303,10 @@
 	    // TODO : lock blitt
 	
 	    //this->drawRect(sx, sy, 128, 64, 1, 0);
+        bool locked = _BLITT_LOCKED;
+        _BLITT_LOCKED = true;
 	    this->cls();
+        _BLITT_LOCKED = locked;
 	    //drawPixShadedRect(x, y, 128, 64, CLR_BLACK, SCREEN_MODE_128 );
 	
 	    for (int yy = 0; yy < height; yy++) {
@@ -294,6 +320,7 @@
 	        }
 	      }
 	    }
+        doBlitt();
     }
     // --------
     
@@ -472,6 +499,7 @@
             }
             */
         }
+        doBlitt();
 	}
 
     
@@ -500,6 +528,7 @@
                 drawPixel(x + xx, y + yy, c16b );
             }
         }
+        doBlitt();
     }
     
     void WiredScreen::drawPCTSprite(char* filename, int dx, int dy, int dw, int dh, int sx, int sy) {
@@ -581,6 +610,7 @@
 	
 	    //display.pushImage(dx, dy, dw, dh, subImage);
 	    this->drawColoredImg(dx, dy, dw, dh, subImage);
+        doBlitt();
     }
 
     void WiredScreen::drawPixel(int x, int y, uint16_t color) {
@@ -626,8 +656,14 @@
             }
 
             unsigned short int t = color;
+            #ifdef DBL_BUFF
+            dblBuff[(y*SCREEN_WIDTH)+x] = t;
+            #else
             *((unsigned short int*)(fbp + location)) = t;
+            #endif
         #endif
+
+        // doBlitt(); ???
     }
      
     int  min(int a,int b) { return a < b ? a : b; }
@@ -719,6 +755,7 @@
                 }
             }
         }
+        doBlitt();
     }
     
     void WiredScreen::drawRect(int x, int y, int w, int h, uint8_t mode, uint16_t color) {
@@ -744,7 +781,7 @@
 	          this->drawPixel(x+w-1,y+yy, color);
 	        }
         }
-
+        doBlitt();
     }
     void WiredScreen::drawCircle(int x, int y, int radius, uint8_t mode, uint16_t color) {
         for (int i = 0; i < 90; i++) {
@@ -760,6 +797,7 @@
 	            this->drawPixel(x - xx, y - yy, color);
             }
         }
+        doBlitt();
     }
     void WiredScreen::drawTriangle(int x, int y, int x2, int y2, int x3, int y3, uint8_t mode, uint16_t color) {
     	// TODO : fill mode
@@ -767,6 +805,7 @@
         this->drawLine(x,y,x2,y2, color);
         this->drawLine(x2,y2,x3,y3, color);
         this->drawLine(x3,y3,x,y, color);
+        doBlitt();
     }
 
     void WiredScreen::drawBall(int x, int y, int radius, uint16_t color) {
@@ -786,6 +825,7 @@
         // serial->write( txBuff, len );
 
         // flushRX(serial);
+        doBlitt();
     }
 
 
@@ -814,6 +854,7 @@
         // serial->write( txBuff, len );
 
         // flushRX(serial);      
+        doBlitt();
     }
 
     void WiredScreen::drawAnimatedBackground(int mode, uint8_t* scene, int sceneLen) {
@@ -829,7 +870,8 @@
         // len = 1; txBuff[0] = 0x00;
         // serial->write( txBuff, len );
 
-        // flushRX(serial);      
+        // flushRX(serial);    
+        doBlitt();  
     }
 
 
