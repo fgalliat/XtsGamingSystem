@@ -217,8 +217,8 @@ static int lcd_sprite (lua_State *L) {
 }
 
 static int lcd_sload (lua_State *L) {
-	const char *str = luaL_optstring(L, 1, NULL);
-	int      sltNum = (int)luaL_optinteger(L, 2, EXIT_SUCCESS);
+	int      sltNum = (int)luaL_optinteger(L, 1, EXIT_SUCCESS);
+	const char *str = luaL_optstring(L, 2, NULL);
 
     console.getScreen()->loadPCTSlot(sltNum, (char*)str);
 

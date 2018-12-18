@@ -130,13 +130,16 @@
         void drawSlotBack(int slotNum, int x, int y) {
           if ( slotNum < 0 || slotNum >= NB_GFX_SLOTS ) { return; }
           GfxSlot slot = slots[slotNum]; 
+
+// printf( "slot[%d] %dx%d\n", slot.getSlotNum(), slot.width, slot.height );
+
           this->drawColoredImg(x, y, slot.width, slot.height, slot.getRaster() );
         }
 
         void drawSlotSprite(int slotNum, int x, int y, int w, int h, int sx, int sy, uint16_t transparentColor = 0x0001) {
           if ( slotNum < 0 || slotNum >= NB_GFX_SLOTS ) { return; }
           GfxSlot slot = slots[slotNum]; 
-          this->drawColoredSprite(x, y, slot.width, slot.height, sx, sy, w, h, slot.getRaster());
+          this->drawColoredSprite(x, y, w, h, sx, sy, slot.width, slot.height, slot.getRaster());
         }
         // -== GfxSlot Support ==-
 

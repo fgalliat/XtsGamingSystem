@@ -567,7 +567,7 @@ static uint16_t color_picturebuff[MEM_RAST_LEN_u16];
 	          //mcu->println( "");
 	          // mcu->println( header );
 	      }
-	//printf("PCT.3 %d x %d \n", w, h);
+	// printf("PCT.3 %d x %d \n", w, h);
 	      // Serial.print("A.2 "); Serial.print(w); Serial.print('x');Serial.print(h);Serial.println("");
 	      if( w <= 0 || h <= 0 ) {
 	        error("Wrong size ");
@@ -590,12 +590,18 @@ static uint16_t color_picturebuff[MEM_RAST_LEN_u16];
 	    //   while( true ) { 
 	        // BEWARE : @ this time : h need to be 128
 	        readed = fread( (uint8_t*)slot.getRaster(), 1, scanZoneSize, f );
+
+// printf("read %d bytes\n", readed);
+// printf("Slot[%d] %d x %d \n", slot.getSlotNum(), slot.width, slot.height);
+
 	    //     this->drawColoredImg(startX, startY+yy, w, MEM_RAST_HEIGHT, color_picturebuff);
 	    //     yy += MEM_RAST_HEIGHT;
 	    //     if ( yy + (MEM_RAST_HEIGHT) > h ) { break; }
 	    //   }
 	
 	      fclose(f);
+
+          slots[slotNum] = slot; // !! BEWARE : really needed !!
 
         return &slot;
     }

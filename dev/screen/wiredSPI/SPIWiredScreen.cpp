@@ -366,6 +366,7 @@
 	    //   }
 	
 	      fclose(f);
+          slots[slotNum] = slot; // !! BEWARE : really needed !!
 
         return &slot;
     }
