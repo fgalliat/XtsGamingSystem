@@ -113,7 +113,7 @@ while(true) do
             end
         end
     lcd.blitt(2)
-    lcd.delay(150);
+    lcd.delay(10);
 
     frameCpt = frameCpt + 1
 end
