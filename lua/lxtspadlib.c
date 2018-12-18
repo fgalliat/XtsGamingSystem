@@ -62,6 +62,9 @@ static void setallfields (lua_State *L, Pad *pad) {
   setboolfield(L, "start", pad->start() );
   setboolfield(L, "A", pad->bt1() );
   setboolfield(L, "B", pad->bt2() );
+
+  setboolfield(L, "changed", pad->hasChanged() );
+  setboolfield(L, "atLeastOne", pad->atLeastOne() );
 }
 
 static int pad_read (lua_State *L) {
