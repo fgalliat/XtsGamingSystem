@@ -37,23 +37,35 @@ function Mario.new()
     self.x = 10
     self.y = LCD_HEIGHT-mario0.sprt.height - 2
 
+	self.sprtG = mariosLR[0+1] 
+
     return self;
 end
 
-function Mario:draw()
-    local idx = 0
-    local sprtG = nil
-    if ( self.running ) then idx = self.step end
-    if ( self.dir == 1 ) then 
-        sprtG = mariosLR[idx+1] 
-    else
-        sprtG = mariosRL[idx+1] 
-    end
+function Mario:isMoving()
+	return self.jump or self.jumpMod ~= 0 or self.running
+end
 
+function Mario:run(_run, dir)
+	local idx = 0
+	self.dir = dir
+    self.running = _run
+	if ( self.running ) then idx = self.step end
+    if ( self.dir == 1 ) then 
+        self.sprtG = mariosLR[idx+1] 
+    else
+        self.sprtG = mariosRL[idx+1] 
+    end	
+end
+
+function Mario:draw()
     if ( self.jump and self.jumpMod < 16 ) then
-        self.jumpMod = self.jumpMod + 3
+        self.jumpMod = self.jumpMod + 3*2
+    elseif ( self.jump and self.jumpMod >= 16 ) then
+    	self.jump = false
+    	self.jumpMod = self.jumpMod - 4*2
     elseif ( not self.jump and self.jumpMod > 0 ) then
-        self.jumpMod = self.jumpMod - 4
+        self.jumpMod = self.jumpMod - 4*2
     end
 
     if self.jumpMod < 0 then
@@ -61,40 +73,59 @@ function Mario:draw()
     end
 
     if ( self.running and self.dir == 0 and self.x > 0 ) then
-        self.x = self.x - 4
+        self.x = self.x - 4*2
     elseif ( self.running and self.dir == 1 and self.x < LCD_WIDTH-16 ) then
-        self.x = self.x + 4
+        self.x = self.x + 4*2
     end
 
-    sprtG:draw( self.x,self.y-self.jumpMod )
+    self.sprtG:draw( self.x,self.y-self.jumpMod )
     self.step = self.step+1
     self.step = self.step%self.nbStep
-
 end
+
+
+
+
 
 local mario = Mario.new()
 
+local screenDirty = true
+
+local frameCounter = 0
+
 while(true) do
     
-    lcd.blitt(0)
-    
-    lcd.sback( 0,0,0 )
-    -- mario0:draw( 10, LCD_HEIGHT-mario0.sprt.height - 2 )
-    mario:draw( 10, LCD_HEIGHT-mario0.sprt.height - 2 )
-    
-    lcd.blitt(2)
-
     local pads = pad.read()
-    if pads.atLeastOne then
+        mario.running = false;
+	    mario.jump = false;
+	    
+    -- if pads.atLeastOne then
         if pads.start then break end
 
-        if pads.left then mario.dir = 0; mario.running = true; end
-        if pads.right then mario.dir = 1; mario.running = true; end
+        if pads.left then mario:run(true,0); 
+        elseif pads.right then mario:run(true,1) 
+        end
         if (pads.up or pads.A) then mario.jump = true; mario.running = false; end
+    -- else
+    --     mario.running = false;
+    --     mario.jump = false;
+    -- end
+    if ( mario:isMoving() ) then
+    	screenDirty = true
     else
-        mario.running = false;
-        mario.jump = false;
+    	mario:run(false, mario.dir);
+    	lcd.delay(5)
     end
 
-  lcd.delay(50)
+    if ( screenDirty and frameCounter%2 == 0) then
+	    lcd.blitt(0)
+	    lcd.sback( 0,0,0 )
+	    -- mario0:draw( 10, LCD_HEIGHT-mario0.sprt.height - 2 )
+	    mario:draw( 10, LCD_HEIGHT-mario0.sprt.height - 2 )
+	    lcd.blitt(2)
+	    screenDirty = false
+    end
+
+	frameCounter = frameCounter + 1
+  --lcd.delay(5)
 end
