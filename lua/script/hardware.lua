@@ -77,7 +77,9 @@ while(true) do
 
         pill0[ (frameCpt%4)+1 ]:draw( 100,100 )
 
+		if ( frameCpt % 3 == 0 ) then
         pads = pad.read()
+        end
 
         if ( snd.isPlaying() ) then
             lcd.print("[MP3] ")
@@ -111,7 +113,7 @@ while(true) do
             end
         end
     lcd.blitt(2)
-    lcd.delay(10);
+    lcd.delay(150);
 
     frameCpt = frameCpt + 1
 end
