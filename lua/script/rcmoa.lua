@@ -14,7 +14,7 @@ SCRIPT_PATH = "./script/"
 function drawSlices(arry)
   -- native animated BCK
   -- lcd.fx(3, arry)
-  
+  lcd.blitt(0)
   lcd.rect( 0,   0, 320, 120, 1, 8 ); -- pink sky
   lcd.rect( 0, 120, 320, 120, 1, 6 ); -- green floor
   
@@ -33,7 +33,7 @@ function drawSlices(arry)
     lcd.rect( (10*i)+10, math.floor( (240-wHeight)/2 ) , 10, wHeight, 1, attr );
     
   end
-  
+  lcd.blitt(2)
 end
 
 

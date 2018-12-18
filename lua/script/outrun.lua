@@ -210,6 +210,8 @@ function renderRoad(gc, delta)
   if ( horizonLine < 0 ) then horizonLine = 0 end
   if ( horizonLine >= HEIGHT ) then horizonLine = HEIGHT-1 end 
   
+  lcd.blitt(0)
+  
   gc:setColorRGB(170,170,255)
   gc:fillRect( 0, 0, WIDTH, horizonLine)
   
@@ -249,6 +251,7 @@ function renderRoad(gc, delta)
         end
         
     end
+    lcd.blitt(2)
 end
 
 function on_paint(gc)
