@@ -59,9 +59,9 @@ function Mario:run(_run, dir)
 end
 
 function Mario:draw()
-    if ( self.jump and self.jumpMod < 16 ) then
+    if ( self.jump and self.jumpMod < 12 ) then
         self.jumpMod = self.jumpMod + 3*2
-    elseif ( self.jump and self.jumpMod >= 16 ) then
+    elseif ( self.jump and self.jumpMod >= 12 ) then
     	self.jump = false
     	self.jumpMod = self.jumpMod - 4*2
     elseif ( not self.jump and self.jumpMod > 0 ) then
@@ -93,6 +93,8 @@ local screenDirty = true
 
 local frameCounter = 0
 
+lcd.sback( 0,0,0 )
+
 while(true) do
     
     local pads = pad.read()
@@ -119,9 +121,10 @@ while(true) do
 
     if ( screenDirty and frameCounter%2 == 0) then
 	    lcd.blitt(0)
-	    lcd.sback( 0,0,0 )
-	    -- mario0:draw( 10, LCD_HEIGHT-mario0.sprt.height - 2 )
-	    mario:draw( 10, LCD_HEIGHT-mario0.sprt.height - 2 )
+	    --lcd.sback( 0,0,0 )
+	    lcd.ssprite( 0, mario.x-4,mario.y-16, 20,32, mario.x-4,mario.y-16 )
+	    
+	    mario:draw()
 	    lcd.blitt(2)
 	    screenDirty = false
     end
