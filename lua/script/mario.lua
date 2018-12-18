@@ -90,7 +90,7 @@ while(true) do
 
         if pads.left then mario.dir = 0; mario.running = true; end
         if pads.right then mario.dir = 1; mario.running = true; end
-        if pads.up then mario.jump = true; mario.running = false; end
+        if (pads.up or pads.A) then mario.jump = true; mario.running = false; end
     else
         mario.running = false;
         mario.jump = false;
