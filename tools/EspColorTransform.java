@@ -70,7 +70,9 @@ public class EspColorTransform {
             int wwidth = workingCopy.getWidth();
             int wheight = workingCopy.getHeight();
 
-            if (img.getWidth() > 160) {
+            if (img.getWidth() == 320) {
+                // let as is, assumes 320x240
+            } else if (img.getWidth() > 160) {
                 wwidth = 160;
                 wheight = 128;
                 Image scaled = img.getScaledInstance(wwidth, wheight, Image.SCALE_SMOOTH);
@@ -139,7 +141,8 @@ public class EspColorTransform {
         if ( !false ) {
             if (args != null && args.length == 0) {
                 // args = new String[] { "./images/boot.png" };
-                args = new String[] { "./images/GODSFNT.png" };
+                // args = new String[] { "./images/GODSFNT.png" };
+                args = new String[] { "./images/DRMARIO.png" };
             }
 
             if (args != null && args.length == 1) {
