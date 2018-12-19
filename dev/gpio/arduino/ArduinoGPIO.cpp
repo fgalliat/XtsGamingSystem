@@ -17,12 +17,53 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <pthread.h>
+
 #include "ArduinoGPIO.h"
 
 extern void delay(int time);
 
 GpioOverArduino::GpioOverArduino(Serial *serial) { this->serial = serial; }
 GpioOverArduino::~GpioOverArduino() {}
+
+#define KEY_USE_THREAD 1
+
+#ifdef KEY_USE_THREAD
+char _k_buffer[16 + 1 + 1]; //  +1 '\n' +1 '\0'
+
+void *_xts_keyThread(void *argument)
+{
+    Serial *serial = (Serial *)argument;
+
+    // static char buffer[16 + 1 + 1]; //  +1 '\n' +1 '\0'
+    memset(_k_buffer, 0x00, 16 + 0 + 1);
+
+    while (true)
+    {
+        // --------------------
+        serial->writestr("SRM2"); // mode 2 (on demand)
+
+        // TODO : lock Serial.write ....
+
+        delay(80); // less time makes Serial Reading hanging
+        // delay(60); // turbo mode works great w/ mario.lua
+        int readed = serial->read(_k_buffer, 16 + 1);
+        // printf("f:%d bytes read\n", readed);
+        // printf("s:%s bytes read\n", buffer);
+
+        if (readed != 16 + 1)
+        {
+            // printf("Oups %d \n", readed);
+            // return NULL;
+        }
+
+        delay(5);
+
+        // --------------------
+        delay(10);
+    }
+}
+#endif
 
 bool GpioOverArduino::init(bool reset)
 {
@@ -50,6 +91,11 @@ bool GpioOverArduino::init(bool reset)
         printf("-- %s bytes read\n", garbageFlushRX);
     }
 
+#ifdef KEY_USE_THREAD
+    pthread_t thread1;
+    int i1 = pthread_create(&thread1, NULL, _xts_keyThread, (void *)this->serial);
+#endif
+
     // return this->readAllPins() != NULL;
     return true;
 
@@ -73,6 +119,11 @@ void GpioOverArduino::stop()
 
 char *GpioOverArduino::readAllPins()
 {
+
+#ifdef KEY_USE_THREAD
+    return _k_buffer;
+#endif
+
     if (!this->ok)
     {
         return NULL;
