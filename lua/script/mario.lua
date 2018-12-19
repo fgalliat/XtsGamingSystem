@@ -182,7 +182,7 @@ while(true) do
         mario:draw()
         
         -- -== Blocs ==-
-        drawLevel()
+        -- drawLevel()
 
 	    lcd.blitt(2)
 	    screenDirty = false
