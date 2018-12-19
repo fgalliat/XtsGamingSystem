@@ -21,6 +21,7 @@
 #include "SoundCard.h"
 
 extern bool __ext_mp3Playing();
+extern bool serialInUse;
 
 void _error(char *str)
 {
@@ -226,6 +227,7 @@ void SoundCard::play(int track)
 	// execute_CMD(this->serial, 0x03, (uint8_t)(track>>8) , (uint8_t)(track));  // play track 1 from SDCARD
 	char msg[16];
 	sprintf(msg, "MPL%d", track);
+	while( serialInUse ) { delay(2); }
 	this->serial->write(msg, strlen(msg));
 	_snd_isPlaying = true;
 	delay(100);
@@ -237,6 +239,7 @@ void SoundCard::volume(int volPercent)
 	// execute_CMD(this->serial, 0x06, 0, _snd_vol); // Set the volume (0x00~0x30)
 	char msg[16];
 	sprintf(msg, "MVL%d", volPercent);
+	while( serialInUse ) { delay(2); }
 	this->serial->write(msg, strlen(msg));
 	delay(100);
 }
@@ -277,6 +280,7 @@ void SoundCard::next()
 {
 	_snd_trackNum++;
 	// execute_CMD(this->serial, 0x01,0,1);
+	while( serialInUse ) { delay(2); }
 	this->serial->writestr("MNX");
 	_snd_isPlaying = true;
 	delay(100);
@@ -285,6 +289,7 @@ void SoundCard::prev()
 {
 	_snd_trackNum--; // TODO : optional mod to _snd_trackNb
 					 // execute_CMD(this->serial, 0x02,0,1);
+	while( serialInUse ) { delay(2); }
 	this->serial->writestr("MPV");
 	_snd_isPlaying = true;
 	delay(100);
@@ -301,6 +306,7 @@ void SoundCard::pause()
 	if (_snd_isPlaying)
 	{
 		// execute_CMD(this->serial, 0x0E,0,0);
+		while( serialInUse ) { delay(2); }
 		this->serial->writestr("MPA");
 		_snd_isPlaying = false;
 		delay(100);
@@ -308,6 +314,7 @@ void SoundCard::pause()
 	else
 	{
 		// execute_CMD(this->serial, 0x0D,0,1);
+		while( serialInUse ) { delay(2); }
 		this->serial->writestr("MPA");
 		_snd_isPlaying = true;
 		delay(100);
@@ -316,6 +323,7 @@ void SoundCard::pause()
 void SoundCard::stop()
 {
 	// execute_CMD(this->serial, 0x0E,0,0);
+	while( serialInUse ) { delay(2); }
 	this->serial->writestr("MSP");
 	_snd_isPlaying = false;
 	delay(100);

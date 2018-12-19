@@ -26,6 +26,8 @@ extern void delay(int time);
 GpioOverArduino::GpioOverArduino(Serial *serial) { this->serial = serial; }
 GpioOverArduino::~GpioOverArduino() {}
 
+bool serialInUse = false;
+
 #define KEY_USE_THREAD 1
 
 #ifdef KEY_USE_THREAD
@@ -40,6 +42,7 @@ void *_xts_keyThread(void *argument)
 
     while (true)
     {
+        serialInUse = true;
         // --------------------
         serial->writestr("SRM2"); // mode 2 (on demand)
 
@@ -60,7 +63,8 @@ void *_xts_keyThread(void *argument)
         delay(5);
 
         // --------------------
-        delay(10);
+        serialInUse = false;
+        delay(50);
     }
 }
 #endif
