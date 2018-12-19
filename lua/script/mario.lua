@@ -83,17 +83,65 @@ function Mario:draw()
     self.step = self.step%self.nbStep
 end
 
+-- -======= Level Drawing ===========-
 
+function readLevel(lvl) 
+    -- defines mario_lvl array
+    dofile("./script/mario_lvl".. lvl ..".lua")
+end
 
+local mario_spErr = SpriteGrabb.new(sprites2, 1,5) 
+local mario_spGround = SpriteGrabb.new(sprites2, 5,2) 
+local mario_spCloud = SpriteGrabb.new(sprites2, 3,2) 
+local mario_spBreakBr = SpriteGrabb.new(sprites2, 0,1) 
+local mario_spTree = SpriteGrabb.new(sprites2, 4,1) 
+local mario_spTreeHead = SpriteGrabb.new(sprites2, 4,0) 
+local mario_spFence = SpriteGrabb.new(sprites2, 2,3) 
+local mario_spMonoBr = SpriteGrabb.new(sprites2, 1,1) 
+local mario_spItemBr = SpriteGrabb.new(sprites2, 0,3) 
+local mario_spUnbreakBr = SpriteGrabb.new(sprites2, 1,2) 
 
+local mario_spArmaEn = SpriteGrabb.new(sprites2, 0,5) 
+
+function getLvlBloc(ch)
+    if ( ch == ' ' ) then return nil; end
+    if ( ch == 'g' ) then return mario_spGround; end
+    if ( ch == 'C' ) then return mario_spCloud; end
+    if ( ch == 'B' ) then return mario_spBreakBr; end
+    if ( ch == 't' ) then return mario_spTree; end
+    if ( ch == 'T' ) then return mario_spTreeHead; end
+    if ( ch == '#' ) then return mario_spFence; end
+    if ( ch == 'b' ) then return mario_spMonoBr; end
+    if ( ch == '?' ) then return mario_spItemBr; end
+    if ( ch == 'U' ) then return mario_spUnbreakBr; end
+    if ( ch == '3' ) then return mario_spArmaEn; end
+    return mario_spErr;
+end
+
+function drawLevel()
+    local x,y,line,ch,sprt
+    for y=1,15 do
+        line = mario_lvl[y]
+        for x=1,20 do
+            ch = string.sub(line, x, x)
+            sprt = getLvlBloc(ch)
+            if ( sprt ~= nil ) then 
+                sprt:draw( (x-1)*16, (y-1)*16 )
+            end
+        end
+    end
+end
+
+-- -======= Game ===========-
 
 local mario = Mario.new()
+readLevel(1)
 
 local screenDirty = true
-
 local frameCounter = 0
 
 lcd.sback( 0,0,0 )
+drawLevel()
 
 while(true) do
     
