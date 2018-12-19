@@ -34,8 +34,10 @@ function Mario.new()
     self.jump = false
     self.jumpMod = 0
 
-    self.x = 10
-    self.y = LCD_HEIGHT-mario0.sprt.height - 2
+    -- self.x = 10
+    -- self.y = LCD_HEIGHT-mario0.sprt.height - 2
+    self.x = 3*16
+    self.y = 12*16
 
 	self.sprtG = mariosLR[0+1] 
 
@@ -105,6 +107,8 @@ local mario_spArmaEn = SpriteGrabb.new(sprites2, 0,5)
 
 function getLvlBloc(ch)
     if ( ch == ' ' ) then return nil; end
+    if ( ch == 'I' ) then return nil; end -- spawn point
+
     if ( ch == 'g' ) then return mario_spGround; end
     if ( ch == 'C' ) then return mario_spCloud; end
     if ( ch == 'B' ) then return mario_spBreakBr; end
@@ -168,11 +172,18 @@ while(true) do
     end
 
     if ( screenDirty and frameCounter%2 == 0) then
-	    lcd.blitt(0)
+        lcd.blitt(0)
+        
+        -- -== Background ==-
 	    --lcd.sback( 0,0,0 )
 	    lcd.ssprite( 0, mario.x-4,mario.y-16, 20,32, mario.x-4,mario.y-16 )
-	    
-	    mario:draw()
+        
+        -- -== Player ==-
+        mario:draw()
+        
+        -- -== Blocs ==-
+        drawLevel()
+
 	    lcd.blitt(2)
 	    screenDirty = false
     end
